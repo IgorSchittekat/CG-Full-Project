@@ -52,7 +52,51 @@ img::EasyImage drawLSystem(std::string lString, const LParser::LSystem2D& lSyste
 	}
 	return draw2DLines(lines, size, bgc);
 }
+/*
+void rec(Lines2D &lines, const LParser::LSystem2D& lSystem, const std::string& init, int nr, const img::Color& c,
+	double turtleAngle, Point2D turtle = { 0,0 }) {
+	//Lines2D lines;
+	const std::set<char> alphabet = lSystem.get_alphabet();
+	const double angle = lSystem.get_angle();
+	if (nr == 0) {
+		for (char character : init) {
+			if (alphabet.find(character) != alphabet.end()) {
+				if (lSystem.draw(character)) {
+					Point2D p1 = turtle;
+					turtle.x += std::cos(turtleAngle * PI / 180);
+					turtle.y += std::sin(turtleAngle * PI / 180);
+					lines.push_back({ p1, turtle, c });
+				}
+				else {
+					turtle.x += std::cos(turtleAngle * PI / 180);
+					turtle.y += std::sin(turtleAngle * PI / 180);
+				}
+			}
+			else if (character == '+') turtleAngle += angle;
+			else if (character == '-') turtleAngle -= angle;
+		}
+	}
+	for (char character : init) {
+		
+		if (character == '+') {}//turtleAngle += angle;
+		else if (character == '-') {}// turtleAngle -= angle;
+		else { 
+			rec(lines, lSystem, lSystem.get_replacement(character), nr - 1, c, turtleAngle, turtle);
+			//Lines2D ret = rec(lines, lSystem, lSystem.get_replacement(character), nr - 1, c, turtleAngle, turtle);
+			//lines.insert(lines.end(), ret.begin(), ret.end()); 
+		}
+	}
+}
 
+img::EasyImage test(const LParser::LSystem2D& lSystem, const img::Color& c, int size, const img::Color& bgc) {
+	const unsigned int nrIt = lSystem.get_nr_iterations();
+	std::string initiator = lSystem.get_initiator();
+	const double startingAngle = lSystem.get_starting_angle();
+	Lines2D l;
+	rec(l, lSystem, initiator, nrIt, c, startingAngle);
+	return draw2DLines(l, size, bgc);
+}
+*/
 
 img::EasyImage LSystems2D(int size, const std::vector<double> &bgColor, const std::string &inFile, const std::vector<double> &color) {
 	LParser::LSystem2D lSystem;
@@ -63,9 +107,8 @@ img::EasyImage LSystems2D(int size, const std::vector<double> &bgColor, const st
 	std::string lString = calculateLSystem(lSystem);
 	img::Color c(color[0] * 255, color[1] * 255, color[2] * 255);
 	img::Color bgc(bgColor[0] * 255, bgColor[1] * 255, bgColor[2] * 255);
-
-
 	return drawLSystem(lString, lSystem, c, size, bgc);
+	//return test(lSystem, c, size, bgc);
 }
 
 
