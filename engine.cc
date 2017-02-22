@@ -1,5 +1,7 @@
 #include "easy_image.hh"
 #include "ini_configuration.hh"
+#include "helpers.hh"
+#include "l_parser.hh"
 
 #include <fstream>
 #include <iostream>
@@ -8,12 +10,76 @@
 #include <cmath>
 #include <assert.h>
 
-inline int roundToInt(const double d) {
-	return (d < 0) ? std::ceil(d - 0.5) : std::floor(d + 0.5);
+#define PI 3.141592653589793238463
+
+std::string calculateLSystem(const LParser::LSystem2D& lSystem) {
+	std::string initiator = lSystem.get_initiator();
+	const unsigned int nrIt = lSystem.get_nr_iterations();
+	
+	for (unsigned int i = 0; i < nrIt; i++) {
+		std::string output;
+		for (char character : initiator) {
+			if (character == '+' || character == '-') output += character;
+			else output += lSystem.get_replacement(character);
+		}
+		initiator = output;
+	}
+	return initiator;
 }
+
+img::EasyImage drawLSystem(std::string lString, const LParser::LSystem2D& lSystem, const img::Color& c, int size, const img::Color& bgc) {
+	const std::set<char> alphabet = lSystem.get_alphabet();
+	const double angle = lSystem.get_angle();
+	const double startingAngle = lSystem.get_starting_angle();
+	Point2D turtle = { 0, 0 };
+	Lines2D lines;
+	double turtleAngle = startingAngle;
+	for (char character : lString) {
+		if (character == '+') turtleAngle += angle;
+		else if (character == '-') turtleAngle -= angle;
+		else {
+			if (lSystem.draw(character)) {
+				Point2D p1 = turtle;
+				turtle.x += std::cos(turtleAngle * PI / 180);
+				turtle.y += std::sin(turtleAngle * PI / 180);
+				lines.push_back({ p1, turtle, c });
+			}
+			else {
+				turtle.x += std::cos(turtleAngle * PI / 180);
+				turtle.y += std::sin(turtleAngle * PI / 180);
+			}
+		}
+	}
+	return draw2DLines(lines, size, bgc);
+}
+
+
+img::EasyImage LSystems2D(int size, const std::vector<double> &bgColor, const std::string &inFile, const std::vector<double> &color) {
+	LParser::LSystem2D lSystem;
+	std::ifstream file(inFile);
+	file >> lSystem;
+	file.close();
+
+	std::string lString = calculateLSystem(lSystem);
+	img::Color c(color[0] * 255, color[1] * 255, color[2] * 255);
+	img::Color bgc(bgColor[0] * 255, bgColor[1] * 255, bgColor[2] * 255);
+
+
+	return drawLSystem(lString, lSystem, c, size, bgc);
+}
+
 
 img::EasyImage generate_image(const ini::Configuration &configuration)
 {
+	std::string type = configuration["General"]["type"].as_string_or_die();
+	if (type == "2DLSystem")
+	{
+		const unsigned int size = configuration["General"]["size"].as_int_or_die();
+		const std::vector<double> bgColor = configuration["General"]["backgroundcolor"].as_double_tuple_or_die();
+		const std::string inFile = configuration["2DLSystem"]["inputfile"].as_string_or_die();
+		const std::vector<double> color = configuration["2DLSystem"]["color"].as_double_tuple_or_die();
+		return LSystems2D(size, bgColor, inFile, color);
+	}
 	
 	return img::EasyImage();
 }

@@ -1,7 +1,6 @@
 #include "helpers.hh"
 #include <cmath>
 #include <algorithm>
-using namespace help;
 
 
 
@@ -10,7 +9,7 @@ int roundToInt(double d) {
 }
 
 
-img::EasyImage draw2DLines(const std::vector<Line2D> &lines, int size) {
+img::EasyImage draw2DLines(const Lines2D &lines, int size, const img::Color& bgc) {
 
 	double xMax = 0, xMin = 0, yMax = 0, yMin = 0;
 	for (Line2D line : lines) {
@@ -32,7 +31,7 @@ img::EasyImage draw2DLines(const std::vector<Line2D> &lines, int size) {
 	const double dx = imageX / 2 - DCx;
 	const double dy = imageY / 2 - DCy;
 	
-	img::EasyImage image(roundToInt(imageX), roundToInt(imageY));
+	img::EasyImage image(roundToInt(imageX+1), roundToInt(imageY+1), bgc);
 
 	for (Line2D line : lines) {
 		image.draw_line(roundToInt(line.p1.x * d + dx), roundToInt(line.p1.y * d + dy),
@@ -40,3 +39,10 @@ img::EasyImage draw2DLines(const std::vector<Line2D> &lines, int size) {
 	}
 	return image;
 }
+
+Point2D& Point2D::operator=(const Point2D& other) {
+	x = other.x;
+	y = other.y;
+	return *this;
+}
+

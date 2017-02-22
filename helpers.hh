@@ -5,34 +5,29 @@
 #include <vector>
 #include <cmath>
 
-namespace help {
-	class Color {
-		double red;
-		double green;
-		double blue;
-	};
+class Point2D {
+public:
+	double x;
+	double y;
+	Point2D& operator=(const Point2D& other);
+};
 
-	class Point2D {
-	public:
-		double x;
-		double y;
-	};
+class Line2D {
+public:
+	Point2D p1;
+	Point2D p2;
+	img::Color c;
+};
+typedef std::vector<Line2D> Lines2D;
 
-	class Line2D {
-	public:
-		Point2D p1;
-		Point2D p2;
-		img::Color c;
-	};
+int roundToInt(double d);
 
-	//int roundToInt(double d);
-
-	img::EasyImage draw2DLines(const std::vector<Line2D> &lines, int size);
+img::EasyImage draw2DLines(const Lines2D &lines, int size, const img::Color& bgc);
 	
 
 	
 
-}
+
 
 
 
