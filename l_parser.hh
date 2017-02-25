@@ -182,7 +182,7 @@ namespace LParser
 		        /**
 		         * \brief the replacement rules of the l-system
 		         */
-			std::map<char, std::string> replacementrules;
+			std::map<char, std::map<double, std::string> > replacementrules;
 
 		        /**
 		         * \brief the number of replacements of the l-system
@@ -260,6 +260,8 @@ namespace LParser
 			 * \brief the starting angle of the 2D-LSystem
 			*/
 			double startingAngle;
+
+      bool stocasticReplacementRule = false;
 	};
 
 	class LSystem3D;
