@@ -23,6 +23,7 @@
 #include <string>
 #include <set>
 #include <exception>
+#include <vector>
 
 
 
@@ -182,7 +183,7 @@ namespace LParser
 		        /**
 		         * \brief the replacement rules of the l-system
 		         */
-			std::map<char, std::map<double, std::string> > replacementrules;
+			std::map<char, std::map<double, std::vector<std::string> > > replacementrules;
 
 		        /**
 		         * \brief the number of replacements of the l-system

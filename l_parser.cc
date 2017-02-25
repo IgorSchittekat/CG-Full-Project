@@ -344,7 +344,7 @@ namespace
 		return num_parenthesis == 0;
 	}
 
-  void parse_rules(std::set<char> const& alphabet, std::map<char, std::map<double, std::string> >& rules, stream_parser& parser, bool parse2D)
+  void parse_rules(std::set<char> const& alphabet, std::map<char, std::map<double, std::vector<std::string> > >& rules, stream_parser& parser, bool parse2D)
 	{
 		parser.skip_comments_and_whitespace();
 		parser.assertChars("Rules");
@@ -381,7 +381,7 @@ namespace
 			std::string rule = parser.readQuotedString();
 			if (!isValidRule(alphabet, rule, parse2D))
 				throw LParser::ParserException(std::string("Invalid rule specification for entry '") + alphabet_char + "' in rule specification", parser.getLine(), parser.getCol());
-			rules[alphabet_char][chance] = rule;
+			rules[alphabet_char][chance].push_back(rule);
 			parser.skip_comments_and_whitespace();
 			c = parser.getChar();
 			if (c == '}')
@@ -501,21 +501,25 @@ std::string const& LParser::LSystem::get_replacement(char c) const
 	assert(get_alphabet().find(c) != get_alphabet().end());
   srand(time(NULL));
   int randomInt = rand() % 100;
-  std::map<double, std::string> ruleChances = replacementrules.find(c)->second;
-  if (ruleChances.size() == 1)
-    return replacementrules.find(c)->second.begin()->second;
+  std::map<double, std::vector<std::string> > ruleChances = replacementrules.find(c)->second;
   double stop = 0.0;
   double sum = 0.0;
+  bool changed = false;
   while (true) {
     double smallest = 1.0;
     for (const auto & chance : ruleChances) {
-      if (chance.first < smallest && chance.first > stop)
+      if (chance.first <= smallest && chance.first > stop) {
         smallest = chance.first;
+        changed = true;
+      }
     }
-    sum += smallest;
-    stop = smallest;
-    if (randomInt < sum * 100)
-      return replacementrules.find(c)->second.find(smallest)->second;
+    sum += smallest * replacementrules.find(c)->second.find(smallest)->second.size();
+    if (changed)
+      stop = smallest;
+    if (randomInt < sum * 100) {
+      int index = rand() % replacementrules.find(c)->second.find(smallest)->second.size();
+      return replacementrules.find(c)->second.find(smallest)->second[index];
+    }
   }
 }
 double LParser::LSystem::get_angle() const
