@@ -23,6 +23,7 @@
 #include <string>
 #include <set>
 #include <exception>
+#include <vector>
 
 
 
@@ -136,7 +137,7 @@ namespace LParser
 			 * \return	replacement string
 			 */
 			std::string const& get_replacement(char c) const;
-
+      std::string get_all_replacements(char c) const;
 			/**
 			 * \brief Returns the angle of the L-System.
 			 *
@@ -182,7 +183,7 @@ namespace LParser
 		        /**
 		         * \brief the replacement rules of the l-system
 		         */
-			std::map<char, std::string> replacementrules;
+			std::map<char, std::map<double, std::vector<std::string> > > replacementrules;
 
 		        /**
 		         * \brief the number of replacements of the l-system
@@ -260,6 +261,8 @@ namespace LParser
 			 * \brief the starting angle of the 2D-LSystem
 			*/
 			double startingAngle;
+
+      bool stocasticReplacementRule = false;
 	};
 
 	class LSystem3D;

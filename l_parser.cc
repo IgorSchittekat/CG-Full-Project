@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <cctype>
 #include <sstream>
+#include <ctime>
 
 
 
@@ -215,7 +216,7 @@ namespace
 			//case with 1 element is special
 			out << "Alphabet = {" << *system.get_alphabet().begin() << "}" << std::endl;
 			out << "Draw = {" << *system.get_alphabet().begin() << " -> " << (system.draw(*system.get_alphabet().begin()) ? 1 : 0) << "}" << std::endl;
-			out << "Rules = {" << *system.get_alphabet().begin() << " -> \"" << system.get_replacement(*system.get_alphabet().begin()) << "\"}" << std::endl;
+			out << "Rules = {" << system.get_all_replacements(*system.get_alphabet().begin()) << "}" << std::endl;
 		}
 		else
 		{
@@ -233,10 +234,9 @@ namespace
 			}
 			out << std::endl << "}" << std::endl;
 
-			out << "Rules = {" << *system.get_alphabet().begin() << "-> \"" << system.get_replacement(*system.get_alphabet().begin()) << "\"";
-			for (std::set<char>::const_iterator i = ++system.get_alphabet().begin(); i != system.get_alphabet().end(); i++)
-			{
-				out << "," << std::endl << "\t" << *i << " -> \"" << system.get_replacement(*i) << "\"";
+			out << "Rules = {" << system.get_all_replacements(*system.get_alphabet().begin());
+			for (std::set<char>::const_iterator i = ++system.get_alphabet().begin(); i != system.get_alphabet().end(); i++) {
+				out << ",\n\t" << system.get_all_replacements(*i);
 			}
 			out << std::endl << "}" << std::endl;
 		}
@@ -317,7 +317,7 @@ namespace
 			{
 				case '+':
 				case '-':
-					break;
+          break;
 				case '^':
 				case '&':
 				case '\\':
@@ -326,7 +326,7 @@ namespace
 					//only valid if parsing a 3D system
 					if (parse2D)
 						return false;
-                                        break;
+          break;
 				case '(':
 					num_parenthesis++;
 					break;
@@ -342,7 +342,8 @@ namespace
 		}
 		return num_parenthesis == 0;
 	}
-	void parse_rules(std::set<char> const& alphabet, std::map<char, std::string>& rules, stream_parser& parser, bool parse2D)
+
+  void parse_rules(std::set<char> const& alphabet, std::map<char, std::map<double, std::vector<std::string> > >& rules, stream_parser& parser, bool parse2D)
 	{
 		parser.skip_comments_and_whitespace();
 		parser.assertChars("Rules");
@@ -359,16 +360,27 @@ namespace
 				throw LParser::ParserException("Invalid Alphabet character", parser.getLine(), parser.getCol());
 			if (alphabet.find(c) == alphabet.end())
 				throw LParser::ParserException(std::string("Replacement rule specified for char '") + c + "' which is not part of the alphabet. ", parser.getLine(), parser.getCol());
-			if (rules.find(c) != rules.end())
-				throw LParser::ParserException(std::string("Double entry '") + c + "' in rules specification ", parser.getLine(), parser.getCol());
+			//if (rules.find(c) != rules.end()) //check for total chance;
+			//	throw LParser::ParserException(std::string("Double entry '") + c + "' in rules specification ", parser.getLine(), parser.getCol());
 			char alphabet_char = c;
 			parser.skip_comments_and_whitespace();
+      double chance = 1.0;
+      if (parser.peekChar() == '(') {
+        parser.getChar();
+        std::string chanceStr = "";
+        while (parser.peekChar() != ')') {
+          chanceStr += parser.getChar();
+        }
+        parser.getChar();
+        chance = stod(chanceStr);
+      }
+      parser.skip_comments_and_whitespace();
 			parser.assertChars("->");
 			parser.skip_comments_and_whitespace();
 			std::string rule = parser.readQuotedString();
 			if (!isValidRule(alphabet, rule, parse2D))
 				throw LParser::ParserException(std::string("Invalid rule specification for entry '") + alphabet_char + "' in rule specification", parser.getLine(), parser.getCol());
-			rules[alphabet_char] = rule;
+  	  rules[alphabet_char][chance].push_back(rule);
 			parser.skip_comments_and_whitespace();
 			c = parser.getChar();
 			if (c == '}')
@@ -451,11 +463,13 @@ const char* LParser::ParserException::what() const throw ()
 LParser::LSystem::LSystem() :
 	alphabet(), drawfunction(), initiator(""), angle(0.0), replacementrules(), nrIterations(0)
 {
+  srand(time(NULL));
 }
 
 LParser::LSystem::LSystem(LSystem const&system) :
 	alphabet(system.alphabet), drawfunction(system.drawfunction), initiator(system.initiator), angle(system.angle), replacementrules(system.replacementrules), nrIterations(system.nrIterations)
 {
+  srand(time(NULL));
 }
 LParser::LSystem::~LSystem()
 {
@@ -486,7 +500,41 @@ bool LParser::LSystem::draw(char c) const
 std::string const& LParser::LSystem::get_replacement(char c) const
 {
 	assert(get_alphabet().find(c) != get_alphabet().end());
-	return replacementrules.find(c)->second;
+  int randomInt = rand() % 100;
+  std::map<double, std::vector<std::string> > ruleChances = replacementrules.find(c)->second;
+  double stop = 0.0;
+  double sum = 0.0;
+  bool changed = false;
+  while (true) {
+    double smallest = 1.0;
+    for (const auto & chance : ruleChances) {
+      if (chance.first <= smallest && chance.first > stop) {
+        smallest = chance.first;
+        changed = true;
+      }
+    }
+    sum += smallest * replacementrules.find(c)->second.find(smallest)->second.size();
+    if (changed)
+      stop = smallest;
+    if (randomInt < sum * 100) {
+      int index = rand() % replacementrules.find(c)->second.find(smallest)->second.size();
+      return replacementrules.find(c)->second.find(smallest)->second[index];
+    }
+  }
+}
+std::string LParser::LSystem::get_all_replacements(char c) const
+{
+  assert(get_alphabet().find(c) != get_alphabet().end());
+  std::stringstream ss;
+  std::map<double, std::vector<std::string> > rules = replacementrules.find(c)->second;
+  for (const auto& chance : rules) {
+    for (std::string rule : chance.second) {
+      ss << c << "(" << chance.first << ") -> \"";
+      ss << rule << "\",\n\t";
+    }
+  }
+  std::string s = ss.str();
+  return s.substr(0, s.length() - 3);
 }
 double LParser::LSystem::get_angle() const
 {

@@ -14,6 +14,7 @@
 
 std::string calculateLSystem(const LParser::LSystem2D& lSystem) {
 	std::string initiator = lSystem.get_initiator();
+  std::cout << lSystem << std::endl;
 	const unsigned int nrIt = lSystem.get_nr_iterations();
 	
 	for (unsigned int i = 0; i < nrIt; i++) {
