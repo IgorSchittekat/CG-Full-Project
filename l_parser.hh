@@ -137,7 +137,7 @@ namespace LParser
 			 * \return	replacement string
 			 */
 			std::string const& get_replacement(char c) const;
-
+      std::string get_all_replacements(char c) const;
 			/**
 			 * \brief Returns the angle of the L-System.
 			 *
