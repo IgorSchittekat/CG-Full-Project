@@ -23,20 +23,5 @@ typedef std::vector<Line2D> Lines2D;
 int roundToInt(double d);
 
 img::EasyImage draw2DLines(const Lines2D &lines, int size, const img::Color& bgc);
-	
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif /* HELPERS_INCLUDED */
