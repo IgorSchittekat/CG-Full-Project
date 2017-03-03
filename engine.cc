@@ -2,6 +2,7 @@
 #include "ini_configuration.hh"
 #include "helpers.hh"
 #include "l_parser.hh"
+#include "figure3D.hh"
 
 #include <fstream>
 #include <iostream>
@@ -88,18 +89,57 @@ img::EasyImage LSystems2D(int size, const std::vector<double> &bgColor, const st
 	return drawLSystem(lString, lSystem, c, size, bgc);
 }
 
+Figure3D calculateFigure(const std::string figureName, const ini::Configuration &configuration) {
+  Figure3D figure;
+  const std::string type = configuration[figureName]["type"].as_string_or_die();
+  if (type == "LineDrawing") {
+    const double scale = configuration[figureName]["scale"].as_double_or_die();
+    const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
+    const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
+    const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
+    const std::vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
+    const std::vector<double> color = configuration[figureName]["color"].as_double_tuple_or_die();
+    const unsigned int nrPoints = configuration[figureName]["nrPoints"].as_int_or_die();
+    const unsigned int nrLines = configuration[figureName]["nrLines"].as_int_or_die();
+    for (unsigned int i = 0; i < nrPoints; i++) {
+      std::vector<double> point = configuration[figureName]["point" + std::to_string(i)].as_double_tuple_or_die();
+      Vector3D p;
+      p.x = point[0];
+      p.y = point[1];
+      p.z = point[2];
+      figure.points.push_back(p);
+    }
+    for (unsigned int i = 0; i < nrLines; i++) {
+      std::vector<int> line = configuration[figureName]["line" + std::to_string(i)].as_int_tuple_or_die();
+      Face f;
+      f.point_indexes = { line[0], line[1] };
+      figure.faces.push_back(f);
+    }
+  }
+  return figure;
+}
+
 
 img::EasyImage generate_image(const ini::Configuration &configuration)
 {
-	std::string type = configuration["General"]["type"].as_string_or_die();
-	if (type == "2DLSystem")
-	{
+	const std::string type = configuration["General"]["type"].as_string_or_die();
+	if (type == "2DLSystem") {
 		const unsigned int size = configuration["General"]["size"].as_int_or_die();
 		const std::vector<double> bgColor = configuration["General"]["backgroundcolor"].as_double_tuple_or_die();
 		const std::string inFile = configuration["2DLSystem"]["inputfile"].as_string_or_die();
 		const std::vector<double> color = configuration["2DLSystem"]["color"].as_double_tuple_or_die();
 		return LSystems2D(size, bgColor, inFile, color);
 	}
+  else if (type == "Wireframe") {
+    const unsigned int size = configuration["General"]["size"].as_int_or_die();
+    const std::vector<double> bgColor = configuration["General"]["backgroundcolor"].as_double_tuple_or_die();
+    const unsigned int nrFigures = configuration["General"]["nrFigures"].as_int_or_die();
+    const std::vector<double> eye = configuration["General"]["eye"].as_double_tuple_or_die();
+    for (unsigned int i = 0; i < nrFigures; i++) {
+      const std::string figureName = "Figure" + std::to_string(i);
+      Figure3D figure = calculateFigure(figureName, configuration);
+    }
+  }
 	
 	return img::EasyImage();
 }
