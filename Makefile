@@ -22,3 +22,4 @@ clean:
 	find . -name '*.o' -delete
 	find . -name '*.d' -delete
 	find . -name '*~'  -delete
+	find . -name 'engine' -delete
