@@ -23,7 +23,7 @@ typedef std::vector<Figure3D> Figures3D;
 
 Matrix scale(const double schale);
 Matrix rotateX(const double angle);
-Matrix rorateY(const double angle);
+Matrix rotateY(const double angle);
 Matrix rotateZ(const double angle);
 Matrix shift(const Vector3D& vector);
 

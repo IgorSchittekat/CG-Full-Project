@@ -22,7 +22,7 @@ Matrix rotateX(const double angle) {
   return m;
 }
 
-Matrix rorateY(const double angle) {
+Matrix rotateY(const double angle) {
   Matrix m;
   m(1, 1) = std::cos(angle * PI / 180);
   m(1, 3) = -std::sin(angle * PI / 180);
@@ -53,7 +53,7 @@ Matrix shift(const Vector3D & vec) {
 void toPolar(const Vector3D& p, double &theta, double &phi, double &r) {
   r = std::sqrt(p.x*p.x + p.y*p.y + p.z*p.z);
   theta = std::atan2(p.y, p.x);
-  phi = std::acos(r);
+  phi = std::acos(p.z/r);
 }
 
 Matrix eyePointTrans(const Vector3D& eyepoint) {
@@ -72,15 +72,14 @@ Matrix eyePointTrans(const Vector3D& eyepoint) {
   return m;
 }
 
-
 void applyTransformation(Figure3D & fig, const Matrix & m) {
-  for (Vector3D point : fig.points) {
+  for (Vector3D& point : fig.points) {
     point *= m;
   }
 }
 
 void applyTransformation(Figures3D & figures, const Matrix & m) {
-  for (Figure3D fig : figures) {
+  for (Figure3D& fig : figures) {
     applyTransformation(fig, m);
   }
 }
@@ -94,12 +93,12 @@ Point2D doProjection(const Vector3D & point, const double d=1) {
 
 Lines2D doProjection(const Figures3D & figures) {
   Lines2D l;
-  for (Figure3D fig : figures) {
-    for (Vector3D point : fig.points) {
+  for (const Figure3D& fig : figures) {
+    for (const Face& face : fig.faces) {
       Line2D line;
-      line.p1 = doProjection(point);
-      line.p2 = { 0,0 };
-      line.c = { 0,0,0 };
+      line.p1 = doProjection(fig.points[face.point_indexes[0]]);
+      line.p2 = doProjection(fig.points[face.point_indexes[1]]);
+      line.c = fig.c;
       l.push_back(line);
     }
   }

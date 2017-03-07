@@ -15,7 +15,6 @@
 
 std::string calculateLSystem(const LParser::LSystem2D& lSystem) {
 	std::string initiator = lSystem.get_initiator();
-  std::cout << lSystem << std::endl;
 	const unsigned int nrIt = lSystem.get_nr_iterations();
 	
 	for (unsigned int i = 0; i < nrIt; i++) {
@@ -64,8 +63,8 @@ img::EasyImage drawLSystem(std::string lString, const LParser::LSystem2D& lSyste
     default:
       if (lSystem.draw(character)) {
         Point2D p1 = turtle;
-        turtle.x += std::cos(turtleAngle * PI / 180);
-        turtle.y += std::sin(turtleAngle * PI / 180);
+        turtle.x += std::cos(turtleAngle * PI / 180.0);
+        turtle.y += std::sin(turtleAngle * PI / 180.0);
         lines.push_back({ p1, turtle, c });
       }
       else {
@@ -89,7 +88,21 @@ img::EasyImage LSystems2D(int size, const std::vector<double> &bgColor, const st
 	return drawLSystem(lString, lSystem, c, size, bgc);
 }
 
-Figure3D calculateFigure(const std::string figureName, const ini::Configuration &configuration) {
+void transform(Figure3D& fig, double scaleFactor, double angleX, double angleY, double angleZ, Vector3D& eye, const Vector3D& center) {
+  Matrix M = scale(scaleFactor);
+  
+  if (angleX != 0)
+    M *= rotateX(angleX);
+  if (angleY != 0)
+    M *= rotateY(angleY);
+  if (angleZ != 0)
+    M *= rotateZ(angleZ);
+  M *= shift(center);
+  M *= eyePointTrans(eye);
+  applyTransformation(fig, M);
+}
+
+Figure3D calculateFigure(const std::string& figureName, const ini::Configuration &configuration, Vector3D& eye) {
   Figure3D figure;
   const std::string type = configuration[figureName]["type"].as_string_or_die();
   if (type == "LineDrawing") {
@@ -115,10 +128,16 @@ Figure3D calculateFigure(const std::string figureName, const ini::Configuration 
       f.point_indexes = { line[0], line[1] };
       figure.faces.push_back(f);
     }
+    Vector3D centerVec;
+    centerVec.x = center[0];
+    centerVec.y = center[1];
+    centerVec.z = center[2];
+    transform(figure, scale, rotateX, rotateY, rotateZ, eye, centerVec);
+    img::Color c(color[0] * 255, color[1] * 255, color[2] * 255);
+    figure.c = c;
   }
   return figure;
 }
-
 
 img::EasyImage generate_image(const ini::Configuration &configuration)
 {
@@ -135,10 +154,18 @@ img::EasyImage generate_image(const ini::Configuration &configuration)
     const std::vector<double> bgColor = configuration["General"]["backgroundcolor"].as_double_tuple_or_die();
     const unsigned int nrFigures = configuration["General"]["nrFigures"].as_int_or_die();
     const std::vector<double> eye = configuration["General"]["eye"].as_double_tuple_or_die();
+    Figures3D figures;
     for (unsigned int i = 0; i < nrFigures; i++) {
       const std::string figureName = "Figure" + std::to_string(i);
-      Figure3D figure = calculateFigure(figureName, configuration);
+      Vector3D eyePoint;
+      eyePoint.x = eye[0];
+      eyePoint.y = eye[1];
+      eyePoint.z = eye[2];
+      figures.push_back(calculateFigure(figureName, configuration, eyePoint));
     }
+    img::Color c(bgColor[0] * 255, bgColor[1] * 255, bgColor[2] * 255);
+    Lines2D lines = doProjection(figures);
+    return draw2DLines(lines, size, c);
   }
 	
 	return img::EasyImage();
