@@ -30,8 +30,7 @@ img::EasyImage draw2DLines(const Lines2D &lines, int size, const img::Color& bgc
 
 	const double dx = imageX / 2 - DCx;
 	const double dy = imageY / 2 - DCy;
-	
-	img::EasyImage image(roundToInt(imageX+1), roundToInt(imageY+1), bgc);
+	img::EasyImage image((int)imageX, (int)imageY, bgc);
 
 	for (Line2D line : lines) {
 		image.draw_line(roundToInt(line.p1.x * d + dx), roundToInt(line.p1.y * d + dy),
