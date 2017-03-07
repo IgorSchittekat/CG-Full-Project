@@ -1,5 +1,5 @@
-#ifndef HELPERS_INCLUDED
-#define HELPERS_INCLUDED
+#ifndef FIGURE2D_INCLUDED
+#define FIGURE2D_INCLUDED
 
 #include "easy_image.hh"
 #include <vector>
@@ -24,4 +24,4 @@ int roundToInt(double d);
 
 img::EasyImage draw2DLines(const Lines2D &lines, int size, const img::Color& bgc);
 
-#endif /* HELPERS_INCLUDED */
+#endif /* FIGURE2D_INCLUDED */

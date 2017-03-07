@@ -1,7 +1,7 @@
 #ifndef FIGURE3D_INCLUDED
 #define FIGURE3D_INCLUDED
 
-#include "helpers.hh"
+#include "figure2D.hh"
 #include "vector.hh"
 #include "easy_image.hh"
 
