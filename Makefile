@@ -23,3 +23,4 @@ clean:
 	find . -name '*.d' -delete
 	find . -name '*~'  -delete
 	find . -name 'engine' -delete
+	find . -name '*.bmp' -delete
