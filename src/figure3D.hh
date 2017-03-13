@@ -7,13 +7,7 @@
 
 #include <vector>
 
-class Face {
-public:
-  Face() {};
-  Face(std::vector<int> point_indexes);
-public:
-  std::vector<int> point_indexes;
-};
+typedef std::vector<int> Face;
 
 class Figure3D {
 public:

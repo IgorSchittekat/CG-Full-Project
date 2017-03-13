@@ -11,7 +11,6 @@ int roundToInt(double d) {
 
 img::EasyImage draw2DLines(const Lines2D &lines, int size, const img::Color& bgc) {
 	double xMax, xMin, yMax, yMin;
-  //std::cout << "size " << xMax << ' ' << xMin << ' ' << yMax << ' ' << yMin << std::endl;
 
 	for (Line2D line : lines) {
 		xMax = std::max(std::max(xMax, line.p1.x), line.p2.x);
