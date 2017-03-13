@@ -7,8 +7,8 @@
 
 
 void transform(Figure3D& fig, double scaleFactor, double angleX, double angleY,
-  double angleZ, Vector3D& eye, const Vector3D& center);
-Figure3D calculateFigure(const std::string& figureName, const ini::Configuration &configuration, Vector3D& eye);
+  double angleZ, const Vector3D& center);
+Figure3D calculateFigure(const std::string& figureName, const ini::Configuration &configuration);
 
 
 

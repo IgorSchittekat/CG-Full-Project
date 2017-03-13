@@ -9,10 +9,16 @@
 
 class Face {
 public:
+  Face() {};
+  Face(std::vector<int> point_indexes);
+public:
   std::vector<int> point_indexes;
 };
 
 class Figure3D {
+public:
+  Figure3D() {};
+  Figure3D(std::vector<Vector3D> points, std::vector<Face> faces, img::Color c);
 public:
   std::vector<Vector3D> points;
   std::vector<Face> faces;
@@ -34,5 +40,11 @@ void applyTransformation(Figures3D& figures, const Matrix& m);
 
 Point2D doProjection(const Vector3D& point, const double d);
 Lines2D doProjection(const Figures3D& figures);
+
+Figure3D createCube(const img::Color& c);
+Figure3D createTetrahedron(const img::Color& c);
+Figure3D createIcosahedron(const img::Color& c);
+Figure3D createDodecahedron(const img::Color& c);
+Figure3D createSphere(const int n, const img::Color& c, const double radius);
 
 #endif // FIGURE3D_INCLUDED
