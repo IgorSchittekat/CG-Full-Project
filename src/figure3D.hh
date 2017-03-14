@@ -39,6 +39,8 @@ Figure3D createCube(const img::Color& c);
 Figure3D createTetrahedron(const img::Color& c);
 Figure3D createIcosahedron(const img::Color& c);
 Figure3D createDodecahedron(const img::Color& c);
-Figure3D createSphere(const int n, const img::Color& c, const double radius);
+Figure3D createSphere(const int n, const img::Color& c);
+Figure3D createCone(const int n, const double h, const img::Color& c);
+Figure3D createCylinder(const int n, const double h, const img::Color& c);
 
 #endif // FIGURE3D_INCLUDED

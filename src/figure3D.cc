@@ -177,63 +177,62 @@ Figure3D createTetrahedron(const img::Color& c) {
 }
 
 Figure3D createIcosahedron(const img::Color& c) { 
-  Vector3D p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12;
-  p1.point(0, 0, std::sqrt(5) / 2);
-  p2.point(1, 0, 0.5);
-  p3.point(std::cos(TAU / 5), std::sin(TAU / 5), 0.5);
-  p4.point(std::cos(2 * TAU / 5), std::sin(2 * TAU / 5), 0.5);
-  p5.point(std::cos(3 * TAU / 5), std::sin(3 * TAU / 5), 0.5);
-  p6.point(std::cos(4 * TAU / 5), std::sin(4 * TAU / 5), 0.5);
-  p7.point(std::cos(PI / 5), std::sin(PI / 5), -0.5);
-  p8.point(std::cos(PI / 5 + TAU / 5), std::sin(PI / 5 + TAU / 5), -0.5);
-  p9.point(std::cos(PI / 5 + 2 * TAU / 5), std::sin(PI / 5 + 2 * TAU / 5), -0.5);
-  p10.point(std::cos(PI / 5 + 3 * TAU / 5), std::sin(PI / 5 + 3 * TAU / 5), -0.5);
-  p11.point(std::cos(PI / 5 + 4 * TAU / 5), std::sin(PI / 5 + 4 * TAU / 5), -0.5);
-  p12.point(0, 0, -std::sqrt(5) / 2);
+  Vector3D p0 = Vector3D::point(0, 0, std::sqrt(5) / 2);
+  Vector3D p1 = Vector3D::point(1, 0, 0.5);
+  Vector3D p2 = Vector3D::point(std::cos(TAU / 5), std::sin(TAU / 5), 0.5);
+  Vector3D p3 = Vector3D::point(std::cos(2 * TAU / 5), std::sin(2 * TAU / 5), 0.5);
+  Vector3D p4 = Vector3D::point(std::cos(3 * TAU / 5), std::sin(3 * TAU / 5), 0.5);
+  Vector3D p5 = Vector3D::point(std::cos(4 * TAU / 5), std::sin(4 * TAU / 5), 0.5);
+  Vector3D p6 = Vector3D::point(std::cos(PI / 5), std::sin(PI / 5), -0.5);
+  Vector3D p7 = Vector3D::point(std::cos(PI / 5 + TAU / 5), std::sin(PI / 5 + TAU / 5), -0.5);
+  Vector3D p8 = Vector3D::point(std::cos(PI / 5 + 2 * TAU / 5), std::sin(PI / 5 + 2 * TAU / 5), -0.5);
+  Vector3D p9 = Vector3D::point(std::cos(PI / 5 + 3 * TAU / 5), std::sin(PI / 5 + 3 * TAU / 5), -0.5);
+  Vector3D p10 = Vector3D::point(std::cos(PI / 5 + 4 * TAU / 5), std::sin(PI / 5 + 4 * TAU / 5), -0.5);
+  Vector3D p11 = Vector3D::point(0, 0, -std::sqrt(5) / 2);
               
-  Face f1 = { 1, 2, 3 };
-  Face f2 = { 1, 3, 4 };
-  Face f3 = { 1, 4, 5 };
-  Face f4 = { 1, 5, 6 };
+  Face f0 = { 0, 1, 2 };
+  Face f1 = { 0, 2, 3 };
+  Face f2 = { 0, 3, 4 };
+  Face f3 = { 0, 4, 5 };
+  Face f4 = { 0, 5, 1 };
   Face f5 = { 1, 6, 2 };
-  Face f6 = { 2, 7, 3 };
-  Face f7 = { 3, 7, 8 };
-  Face f8 = { 3, 8, 4 };
-  Face f9 = { 4, 8, 9 };
-  Face f10 = { 4, 9, 5 };
-  Face f11 = { 5, 9, 10 };
-  Face f12 = { 5, 10, 6 };
-  Face f13 = { 6, 10, 11 };
-  Face f14 = { 6, 11, 2 };
-  Face f15 = { 2, 11, 7 };
-  Face f16 = { 12, 8, 7 };
-  Face f17 = { 12, 9, 8 };
-  Face f18 = { 12, 10, 9 };
-  Face f19 = { 12, 11, 10 };
-  Face f20 = { 12, 7, 11 };
+  Face f6 = { 2, 6, 7 };
+  Face f7 = { 2, 7, 3 };
+  Face f8 = { 3, 7, 8 };
+  Face f9 = { 3, 8, 4 };
+  Face f10 = { 4, 8, 9 };
+  Face f11 = { 4, 9, 5 };
+  Face f12 = { 5, 9, 10 };
+  Face f13 = { 5, 10, 1 };
+  Face f14 = { 1, 10, 6 };
+  Face f15 = { 11, 7, 6 };
+  Face f16 = { 11, 8, 7 };
+  Face f17 = { 11, 9, 8 };
+  Face f18 = { 11, 10, 9 };
+  Face f19 = { 11, 6, 10 };
 
-  Figure3D fig({ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 },
-  { f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20 }, c);
+  Figure3D fig({ p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11 },
+  { f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19 }, c);
 
   return fig;
 }
 
 Figure3D createDodecahedron(const img::Color& c) {
   Figure3D ico = createIcosahedron(c);
-  Face f1 = { 1, 2, 3, 4, 5 };
-  Face f2 = { 1, 6, 7, 8, 2 };
-  Face f3 = { 2, 8, 9, 10, 3 };
-  Face f4 = { 3, 10, 11, 12, 4 };
-  Face f5 = { 4, 12, 13, 14, 5 };
-  Face f6 = { 5, 14, 15, 6, 1 };
-  Face f7 = { 20, 19, 18, 17, 16 };
-  Face f8 = { 20, 15, 14, 13, 19 };
-  Face f9 = { 19, 13, 12, 11, 18 };
-  Face f10 = { 18, 11, 10, 9, 17 };
-  Face f11 = { 17, 9, 8, 7, 16 };
-  Face f12 = { 16, 7, 6, 15, 20 };
+  Face f0 = { 0, 1, 2, 3, 4 };
+  Face f1 = { 0, 5, 6, 7, 1 };
+  Face f2 = { 1, 7, 8, 9, 2 };
+  Face f3 = { 2, 9, 10, 11, 3 };
+  Face f4 = { 3, 11, 12, 13, 4 };
+  Face f5 = { 4, 13, 14, 5, 0 };
+  Face f6 = { 19, 18, 17, 16, 15 };
+  Face f7 = { 19, 14, 13, 12, 18 };
+  Face f8 = { 18, 12, 11, 10, 17 };
+  Face f9 = { 17, 10, 9, 8, 16 };
+  Face f10 = { 16, 8, 7, 6, 15 };
+  Face f11 = { 15, 6, 5, 14, 19 };
 
-  Figure3D dod({}, { f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12 }, c);
+  Figure3D dod({}, { f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11 }, c);
   for (Face face : ico.faces) {
     const Vector3D A = ico.points[face[0]];
     const Vector3D B = ico.points[face[1]];
@@ -250,10 +249,9 @@ void splitIcosahedron(Figure3D& fig) {
     Vector3D A = fig.points[face[0]];
     Vector3D B = fig.points[face[1]];
     Vector3D C = fig.points[face[2]];
-    Vector3D D, E, F;
-    D.point((A.x + B.x) / 2, (A.y + B.y) / 2, (A.z + B.z) / 2);
-    E.point((A.x + C.x) / 2, (A.y + C.y) / 2, (A.z + C.z) / 2);
-    F.point((B.x + C.x) / 2, (B.y + C.y) / 2, (B.z + C.z) / 2);
+    Vector3D D = Vector3D::point((A.x + B.x) / 2, (A.y + B.y) / 2, (A.z + B.z) / 2);
+    Vector3D E = Vector3D::point((A.x + C.x) / 2, (A.y + C.y) / 2, (A.z + C.z) / 2);
+    Vector3D F = Vector3D::point((B.x + C.x) / 2, (B.y + C.y) / 2, (B.z + C.z) / 2);
     fig.points.push_back(D);
     fig.points.push_back(E);
     fig.points.push_back(F);
@@ -276,15 +274,59 @@ void splitIcosahedron(Figure3D& fig) {
   fig.faces = newFaces;
 }
 
-Figure3D createSphere(const int n, const img::Color& c, const double radius) {
+Figure3D createSphere(const int n, const img::Color& c) {
   Figure3D ico = createIcosahedron(c);
   for (int i = 0; i < n; i++) {
     splitIcosahedron(ico);
   }
-  for (Vector3D point : ico.points) {
+  for (Vector3D& point : ico.points) {
     point.normalise();
   }
   return ico;
 }
 
+Figure3D createCone(const int n, const double h, const img::Color& c) {
+  Figure3D fig;
+  fig.c = c;
+  Face fn, f;
+  for (int i = 0; i < n; i++) {
+    Vector3D p = Vector3D::point(std::cos(i * TAU / n), std::sin(i * TAU / n), 0);
+    fig.points.push_back(p);
+    if (i != n - 1)
+      f = { i, i + 1, n };
+    else
+      f = { 0, i, n };
+    fig.faces.push_back(f);
+    fn.insert(fn.begin(), i);
+  }
+  fig.faces.push_back(fn);
+  Vector3D top = Vector3D::point(0, 0, h);
+  fig.points.push_back(top);
+  return fig;
+}
 
+Figure3D createCylinder(const int n, const double h, const img::Color& c) {
+  Figure3D fig;
+  fig.c = c;
+  for (int i = 0; i < n; i++) {
+    Vector3D p = Vector3D::point(std::cos(i * TAU / n), std::sin(i * TAU / n), 0);
+    fig.points.push_back(p);
+  }
+  for (int i = 0; i < n; i++) {
+    Vector3D p = Vector3D::point(std::cos(i * TAU / n), std::sin(i * TAU / n), h);
+    fig.points.push_back(p);
+  }
+  Face f1, f2, f;
+  for (int i = 0; i < n; i++) {
+    if (i != n - 1)
+      f = { i, i + 1, i + n + 1, i + n };
+    else
+      f = { i, 0, n, i + n };
+    fig.faces.push_back(f);
+    f1.insert(f1.begin(), i);
+    f2.push_back(i + n);
+  }
+  fig.faces.push_back(f1);
+  fig.faces.push_back(f2);
+  return fig;
+}

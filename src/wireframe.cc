@@ -1,8 +1,9 @@
 #include "wireframe.hh"
+#include "l_parser.hh"
+#include "lSystem.hh"
 
 void transform(Figure3D& fig, double scaleFactor, double angleX, double angleY,
   double angleZ, const Vector3D& center) {
-  std::cout << center << std::endl;
   applyTransformation(fig, shift(center));
   Matrix M = scale(scaleFactor);
   
@@ -48,6 +49,42 @@ Figure3D calculateFigure(const std::string& figureName, const ini::Configuration
   }
   else if (type == "Cube") {
     figure = createCube(c);
+  }
+  else if (type == "Tetrahedron") {
+    figure = createTetrahedron(c);
+  }
+  else if (type == "Icosahedron") {
+    figure = createIcosahedron(c);
+  }
+  else if (type == "Dodecahedron") {
+    figure = createDodecahedron(c);
+  }
+  else if (type == "Cone") {
+    const unsigned int n = configuration[figureName]["n"].as_int_or_die();
+    const double h = configuration[figureName]["height"].as_double_or_die();
+    figure = createCone(n, h, c);
+  }
+    else if (type == "Cylinder") {
+    const unsigned int n = configuration[figureName]["n"].as_int_or_die();
+    const double h = configuration[figureName]["height"].as_double_or_die();
+    figure = createCylinder(n, h, c);
+  }
+  else if (type == "Sphere") {
+    const unsigned int n = configuration[figureName]["n"].as_int_or_die();
+    figure = createSphere(n, c);
+  }
+  else if (type == "Torus"){
+
+  }
+  else if (type == "Octahedron"){
+
+  }
+  else if (type == "3DLSystem") {
+  //  const std::string inFile = configuration[figureName]["inputfile"].as_string_or_die();
+  //  figure = LSystems3D(inFile);
+  }
+  else {
+    return Figure3D();
   }
   transform(figure, scale, rotateX, rotateY, rotateZ, centerVec);
   return figure;

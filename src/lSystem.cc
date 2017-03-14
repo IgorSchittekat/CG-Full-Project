@@ -14,7 +14,8 @@ std::string calculateLSystem(const LParser::LSystem2D& lSystem) {
     std::string output;
     for (char character : initiator) {
       switch (character) {
-      case '+': case '-': case '(': case ')': case '[': case ']':
+      case '+': case '-': case '(': case ')': case '[': case ']': 
+      case '^': case '&': case '\\': case '/': case '|': // for 3D lSystems only
         output += character;
         break;
       default:
@@ -69,6 +70,34 @@ img::EasyImage drawLSystem(std::string lString, const LParser::LSystem2D& lSyste
   return draw2DLines(lines, size, bgc);
 }
 
+Figure3D drawLSystem(std::string lString, const LParser::LSystem3D& lSystem){
+  const std::set<char> alphabet = lSystem.get_alphabet();
+  const double angle = lSystem.get_angle();
+  Vector3D turtle = Vector3D::point(0, 0, 0);
+  std::vector<double> angleStack;
+  std::vector<Vector3D> turtleStack;
+  for (char character:lString) {
+    switch (character) {
+      //case '+':
+      //  turtleAngle += angle;
+      //  break;
+      //case '-':
+      //  turtleAngle -= angle;
+      //  break;
+      //case '(': case '[':
+      //  angleStack.push_back(turtleAngle);
+      //  turtleStack.push_back(turtle);
+      //  break;
+      //case ')': case ']':
+      //  turtleAngle = angleStack.back();
+      //  turtle = turtleStack.back();
+      //  angleStack.pop_back();
+      //  turtleStack.pop_back();
+      //  break;
+    }
+  }
+}
+
 img::EasyImage LSystems2D(int size, const std::vector<double> &bgColor, const std::string &inFile, const std::vector<double> &color) {
   LParser::LSystem2D lSystem;
   std::ifstream file(inFile);
@@ -79,4 +108,13 @@ img::EasyImage LSystems2D(int size, const std::vector<double> &bgColor, const st
   img::Color c(color[0] * 255, color[1] * 255, color[2] * 255);
   img::Color bgc(bgColor[0] * 255, bgColor[1] * 255, bgColor[2] * 255);
   return drawLSystem(lString, lSystem, c, size, bgc);
+}
+
+Figure3D LSystems3D(const std::string &inFile){
+  LParser::LSystem3D lSystem;
+  std::ifstream file(inFile);
+  file >> lSystem;
+  file.close();
+
+  //std::string lString = calculateLSystem(lSystem);
 }
