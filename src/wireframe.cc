@@ -4,7 +4,6 @@
 
 void transform(Figure3D& fig, double scaleFactor, double angleX, double angleY,
   double angleZ, const Vector3D& center) {
-  applyTransformation(fig, shift(center));
   Matrix M = scale(scaleFactor);
   
   if (angleX != 0)
@@ -13,6 +12,7 @@ void transform(Figure3D& fig, double scaleFactor, double angleX, double angleY,
     M *= rotateY(angleY);
   if (angleZ != 0)
     M *= rotateZ(angleZ);
+  M *= shift(center);
   applyTransformation(fig, M);
 }
 
@@ -74,10 +74,14 @@ Figure3D calculateFigure(const std::string& figureName, const ini::Configuration
     figure = createSphere(n, c);
   }
   else if (type == "Torus"){
-
+    const double r = configuration[figureName]["r"].as_double_or_die();
+    const double R = configuration[figureName]["R"].as_double_or_die();
+    const unsigned int m = configuration[figureName]["m"].as_int_or_die();
+    const unsigned int n = configuration[figureName]["n"].as_int_or_die();
+    figure = createTorus(r, R, m, n, c);
   }
   else if (type == "Octahedron"){
-
+    figure = createOctahedron(c);
   }
   else if (type == "3DLSystem") {
   //  const std::string inFile = configuration[figureName]["inputfile"].as_string_or_die();

@@ -243,6 +243,27 @@ Figure3D createDodecahedron(const img::Color& c) {
   return dod;
 }
 
+Figure3D createOctahedron(const img::Color& c) {
+  Vector3D p0 = Vector3D::point(1, 0, 0);
+  Vector3D p1 = Vector3D::point(0, 1, 0);
+  Vector3D p2 = Vector3D::point(-1, 0, 0);
+  Vector3D p3 = Vector3D::point(0, -1, 0);
+  Vector3D p4 = Vector3D::point(0, 0, -1);
+  Vector3D p5 = Vector3D::point(0, 0, 1);  
+
+  Face f0 = { 0, 1, 5 };
+  Face f1 = { 1, 2, 5 };
+  Face f2 = { 2, 3, 5 };
+  Face f3 = { 3, 0, 5 };
+  Face f4 = { 1, 0, 4 };
+  Face f5 = { 2, 1, 4 };
+  Face f6 = { 3, 2, 4 };
+  Face f7 = { 0, 3, 4 };
+
+  Figure3D fig({ p0, p1, p2, p3, p4, p5 }, { f0, f1, f2, f3, f4, f5, f6, f7 }, c);
+  return fig;
+}
+
 void splitIcosahedron(Figure3D& fig) {
   std::vector<Face> newFaces;
   for (Face face : fig.faces) {
@@ -328,5 +349,28 @@ Figure3D createCylinder(const int n, const double h, const img::Color& c) {
   }
   fig.faces.push_back(f1);
   fig.faces.push_back(f2);
+  return fig;
+}
+
+Figure3D createTorus(const double r, const double R, const int n, const int m, const img::Color& c) {
+  Figure3D fig;
+  fig.c = c;
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < m; j++) {
+      double u = TAU * i / n;
+      double v = TAU * j / m;
+      double x = (R + r * std::cos(v)) * std::cos(u);
+      double y = (R + r * std::cos(v)) * std::sin(u);
+      double z = r * std::sin(v);
+      Vector3D p = Vector3D::point(x, y, z);
+      fig.points.push_back(p);
+    }
+  }
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < m; j++) {
+      Face f = { m * i + j, m * ((i + 1) % n) + j, m * ((i + 1) % n) + (j + 1) % m, m * i + (j + 1) % m };
+      fig.faces.push_back(f);
+    }
+  }
   return fig;
 }

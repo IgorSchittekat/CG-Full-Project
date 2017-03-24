@@ -11,6 +11,7 @@ img::EasyImage generate_image(const ini::Configuration &configuration)
 {
 	const std::string type = configuration["General"]["type"].as_string_or_die();
 	if (type == "2DLSystem") {
+		std::cout << "HIER" <<std::endl;
 		const unsigned int size = configuration["General"]["size"].as_int_or_die();
 		const std::vector<double> bgColor = configuration["General"]["backgroundcolor"].as_double_tuple_or_die();
 		const std::string inFile = configuration["2DLSystem"]["inputfile"].as_string_or_die();

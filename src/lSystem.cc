@@ -101,6 +101,10 @@ Figure3D drawLSystem(std::string lString, const LParser::LSystem3D& lSystem){
 img::EasyImage LSystems2D(int size, const std::vector<double> &bgColor, const std::string &inFile, const std::vector<double> &color) {
   LParser::LSystem2D lSystem;
   std::ifstream file(inFile);
+  if (!file.is_open()) {
+    std::cerr << "ERROR: File " << inFile << " not found!" << std::endl;
+    return img::EasyImage();
+  }
   file >> lSystem;
   file.close();
 
