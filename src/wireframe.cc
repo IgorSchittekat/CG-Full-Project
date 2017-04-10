@@ -84,8 +84,8 @@ Figure3D calculateFigure(const std::string& figureName, const ini::Configuration
     figure = createOctahedron(c);
   }
   else if (type == "3DLSystem") {
-  //  const std::string inFile = configuration[figureName]["inputfile"].as_string_or_die();
-  //  figure = LSystems3D(inFile);
+    const std::string inFile = configuration[figureName]["inputfile"].as_string_or_die();
+    figure = LSystems3D(inFile, color);
   }
   else {
     return Figure3D();
