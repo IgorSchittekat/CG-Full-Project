@@ -1,5 +1,6 @@
 #ifndef WIREFRAME_INCLUDED
 #define WIREFRAME_INCLUDED
+#pragma once
 
 #include "ini_configuration.hh"
 #include "figure3D.hh"

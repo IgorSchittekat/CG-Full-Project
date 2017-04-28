@@ -1,5 +1,6 @@
 #ifndef L_SYSTEM_INCLUDED
 #define L_SYSTEM_INCLUDED
+#pragma once
 
 #include "l_parser.hh"
 #include "easy_image.hh"

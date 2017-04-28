@@ -1,6 +1,7 @@
 #include "lSystem.hh"
 #include "wireframe.hh"
 #include "ini_configuration.hh"
+#include "figure3D.hh"
 
 #include <fstream>
 #include <iostream>
@@ -11,14 +12,13 @@ img::EasyImage generate_image(const ini::Configuration &configuration)
 {
 	const std::string type = configuration["General"]["type"].as_string_or_die();
 	if (type == "2DLSystem") {
-		std::cout << "HIER" <<std::endl;
 		const unsigned int size = configuration["General"]["size"].as_int_or_die();
 		const std::vector<double> bgColor = configuration["General"]["backgroundcolor"].as_double_tuple_or_die();
 		const std::string inFile = configuration["2DLSystem"]["inputfile"].as_string_or_die();
 		const std::vector<double> color = configuration["2DLSystem"]["color"].as_double_tuple_or_die();
 		return LSystems2D(size, bgColor, inFile, color);
 	}
-	else if (type == "Wireframe") {
+	else if (type == "Wireframe" || type == "ZBufferedWireframe") {
 		const unsigned int size = configuration["General"]["size"].as_int_or_die();
 		const std::vector<double> bgColor = configuration["General"]["backgroundcolor"].as_double_tuple_or_die();
 		const unsigned int nrFigures = configuration["General"]["nrFigures"].as_int_or_die();
@@ -34,7 +34,11 @@ img::EasyImage generate_image(const ini::Configuration &configuration)
 		Matrix M = eyePointTrans(eyePoint);
 		applyTransformation(figures, M);
 		Lines2D lines = doProjection(figures);
-		return draw2DLines(lines, size, c);
+		if (type == "ZBufferedWireframe") {
+			return draw2DLines(lines, size, c, true);
+		}
+		else 
+			return draw2DLines(lines, size, c);
 	}
 	return img::EasyImage();
 }

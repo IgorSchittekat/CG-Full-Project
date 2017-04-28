@@ -88,7 +88,7 @@ void applyTransformation(Figures3D & figures, const Matrix & m) {
   }
 }
 
-Point2D doProjection(const Vector3D & point, const double d=1) {
+Point2D doProjection(const Vector3D & point, const double d) {
   Point2D p;
   p.x = (d * point.x) / -point.z;
   p.y = (d * point.y) / -point.z;
@@ -104,10 +104,14 @@ Lines2D doProjection(const Figures3D & figures) {
         if (i != face.size()-1){
           line.p1 = doProjection(fig.points[face[i]]);
           line.p2 = doProjection(fig.points[face[i+1]]);
+          line.z1 = fig.points[face[i]].z;
+          line.z2 = fig.points[face[i+1]].z;
         }
         else {
           line.p1 = doProjection(fig.points[face[i]]);
           line.p2 = doProjection(fig.points[face[0]]);
+          line.z1 = fig.points[face[i]].z;
+          line.z2 = fig.points[face[0]].z;
         }
         line.c = fig.c;
         l.push_back(line);

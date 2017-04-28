@@ -1,5 +1,6 @@
 #ifndef FIGURE3D_INCLUDED
 #define FIGURE3D_INCLUDED
+#pragma once
 
 #include "figure2D.hh"
 #include "vector.hh"
@@ -7,6 +8,9 @@
 
 #include <vector>
 
+class Point2D;
+class Line2D;
+typedef std::vector<Line2D> Lines2D;
 typedef std::vector<int> Face;
 
 class Figure3D {
@@ -32,7 +36,7 @@ Matrix eyePointTrans(const Vector3D& eyepoint);
 void applyTransformation(Figure3D& fig, const Matrix& m);
 void applyTransformation(Figures3D& figures, const Matrix& m);
 
-Point2D doProjection(const Vector3D& point, const double d);
+Point2D doProjection(const Vector3D& point, const double d = 1);
 Lines2D doProjection(const Figures3D& figures);
 
 Figure3D createCube(const img::Color& c);

@@ -9,7 +9,7 @@ int roundToInt(double d) {
 }
 
 
-img::EasyImage draw2DLines(const Lines2D &lines, int size, const img::Color& bgc) {
+img::EasyImage draw2DLines(const Lines2D &lines, int size, const img::Color& bgc, bool zBuffered) {
 	double xMax, xMin, yMax, yMin;
 
 	for (Line2D line : lines) {
@@ -31,11 +31,25 @@ img::EasyImage draw2DLines(const Lines2D &lines, int size, const img::Color& bgc
 	const double dx = imageX / 2 - DCx;
 	const double dy = imageY / 2 - DCy;
 	img::EasyImage image((int)imageX, (int)imageY, bgc);
+	ZBuffer buffer((int)imageX, (int)imageY);
 	for (Line2D line : lines) {
-		image.draw_line(roundToInt(line.p1.x * d + dx), roundToInt(line.p1.y * d + dy),
-			roundToInt(line.p2.x * d + dx), roundToInt(line.p2.y * d + dy), line.c);
+		if (!zBuffered)
+			image.draw_line(roundToInt(line.p1.x * d + dx), roundToInt(line.p1.y * d + dy),
+				roundToInt(line.p2.x * d + dx), roundToInt(line.p2.y * d + dy), line.c);
+		else {
+			buffer.draw_zbuf_line(image, roundToInt(line.p1.x * d + dx), roundToInt(line.p1.y * d + dy), 
+				line.z1, roundToInt(line.p2.x * d + dx), roundToInt(line.p2.y * d + dy), line.z2, line.c);
+		}
 	}
 	return image;
+}
+
+Point2D::Point2D() {
+}
+
+Point2D::Point2D(double x, double y) :
+	x(x),
+	y(y) {
 }
 
 Point2D& Point2D::operator=(const Point2D& other) {
