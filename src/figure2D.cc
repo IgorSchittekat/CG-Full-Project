@@ -1,6 +1,7 @@
 #include "figure2D.hh"
 #include <cmath>
 #include <algorithm>
+#include <limits>
 
 
 
@@ -11,12 +12,14 @@ int roundToInt(double d) {
 
 img::EasyImage draw2DLines(const Lines2D &lines, int size, const img::Color& bgc, bool zBuffered) {
 	double xMax, xMin, yMax, yMin;
+	xMax = yMax = -std::numeric_limits<double>::infinity();
+	xMin = yMin = std::numeric_limits<double>::infinity();
 
 	for (Line2D line : lines) {
-		xMax = std::max(std::max(xMax, line.p1.x), line.p2.x);
-		xMin = std::min(std::min(xMin, line.p1.x), line.p2.x);
-		yMax = std::max(std::max(yMax, line.p1.y), line.p2.y);
-		yMin = std::min(std::min(yMin, line.p1.y), line.p2.y);
+		xMax = std::max({ xMax, line.p1.x, line.p2.x });
+		xMin = std::min({ xMin, line.p1.x, line.p2.x });
+		yMax = std::max({ yMax, line.p1.y, line.p2.y });
+		yMin = std::min({ yMin, line.p1.y, line.p2.y });
 	}
 	const double xRange = xMax - xMin;
 	const double yRange = yMax - yMin;

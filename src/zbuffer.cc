@@ -49,7 +49,11 @@ void ZBuffer::draw_zbuf_line(img::EasyImage& img, unsigned int x0, unsigned int 
 		for (unsigned int i = std::min(y0, y1); i <= std::max(y0, y1); i++) {
 			int x = x0;
 			int y = i;
-			double  z = zmin + (zmax - zmin)*((i - ymin) / (ymax - ymin));
+			double z;
+			if (y0 == y1)
+				z = zmin + i * (zmax - zmin);
+			else
+				z = zmin + (zmax - zmin)*((i - ymin) / (ymax - ymin));
 			if (getBuffer(x, y) > 1/z) {
 				setBuffer(x, y, 1/z);
 				(img)(x, y) = color;
