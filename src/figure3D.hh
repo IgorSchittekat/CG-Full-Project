@@ -5,11 +5,13 @@
 #include "figure2D.hh"
 #include "vector.hh"
 #include "easy_image.hh"
-
+#include "zbuffer.hh"
 #include <vector>
+#pragma once
 
 class Point2D;
 class Line2D;
+class ZBuffer;
 typedef std::vector<Line2D> Lines2D;
 typedef std::vector<int> Face;
 
@@ -48,5 +50,8 @@ Figure3D createSphere(const int n, const img::Color& c);
 Figure3D createCone(const int n, const double h, const img::Color& c);
 Figure3D createCylinder(const int n, const double h, const img::Color& c);
 Figure3D createTorus(const double r, const double R, const int n, const int m, const img::Color& c);
+
+std::vector<Face> triangulate(const Face& face);
+img::EasyImage drawFigures(Figures3D& figures, int size, const img::Color& bgc);
 
 #endif // FIGURE3D_INCLUDED

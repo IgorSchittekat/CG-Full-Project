@@ -1,6 +1,8 @@
 #include "figure3D.hh"
-
+#include <limits>
+#include <iostream>
 #include <cmath>
+#include <algorithm>
 
 #define PI 3.141592653589793238463
 #define TAU 6.283185307179586476925
@@ -377,4 +379,54 @@ Figure3D createTorus(const double r, const double R, const int n, const int m, c
     }
   }
   return fig;
+}
+
+std::vector<Face> triangulate(const Face& face) {
+	std::vector<Face> faces;
+	if (face.size() < 3) {
+		faces.push_back(face);
+		return faces;
+	}
+	for (int i = 1; i < face.size() - 1; i++) {
+		Face newFace = { face[0], face[i], face[i + 1] };
+		faces.push_back(newFace);
+	}
+	return faces;
+}
+
+img::EasyImage drawFigures(Figures3D& figures, int size, const img::Color& bgc) {
+	double xMax, xMin, yMax, yMin;
+	xMax = yMax = -std::numeric_limits<double>::infinity();
+	xMin = yMin = std::numeric_limits<double>::infinity();
+	Lines2D lines = doProjection(figures);
+	for (Line2D& line : lines) {
+		xMax = std::max({ xMax, line.p1.x, line.p2.x });
+		xMin = std::min({ xMin, line.p1.x, line.p2.x });
+		yMax = std::max({ yMax, line.p1.y, line.p2.y });
+		yMin = std::min({ yMin, line.p1.y, line.p2.y });
+	}
+	const double xRange = xMax - xMin;
+	const double yRange = yMax - yMin;
+	const double imageX = size * (xRange / std::max(xRange, yRange));
+	const double imageY = size * (yRange / std::max(xRange, yRange));
+	const double d = 0.95 * (imageX / xRange);
+
+	const double DCx = d * (xMin + xMax) / 2;
+	const double DCy = d * (yMin + yMax) / 2;
+
+	const double dx = imageX / 2 - DCx;
+	const double dy = imageY / 2 - DCy;
+	img::EasyImage image((int)imageX, (int)imageY, bgc);
+	ZBuffer buffer((int)imageX, (int)imageY);
+
+	for (Figure3D& figure : figures) {
+		for (Face& face : figure.faces) {
+			std::vector<Face> triangles = triangulate(face);
+			for (Face& triangle : triangles) {
+				buffer.draw_zbuf_triag(image, figure.points[triangle[0]],
+					figure.points[triangle[1]], figure.points[triangle[2]], d, dx, dy, figure.c);
+			}
+		}
+	}
+	return image;
 }

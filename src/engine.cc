@@ -18,7 +18,7 @@ img::EasyImage generate_image(const ini::Configuration &configuration)
 		const std::vector<double> color = configuration["2DLSystem"]["color"].as_double_tuple_or_die();
 		return LSystems2D(size, bgColor, inFile, color);
 	}
-	else if (type == "Wireframe" || type == "ZBufferedWireframe") {
+	else if (type == "Wireframe" || type == "ZBufferedWireframe" || type == "ZBuffering") {
 		const unsigned int size = configuration["General"]["size"].as_int_or_die();
 		const std::vector<double> bgColor = configuration["General"]["backgroundcolor"].as_double_tuple_or_die();
 		const unsigned int nrFigures = configuration["General"]["nrFigures"].as_int_or_die();
@@ -26,13 +26,15 @@ img::EasyImage generate_image(const ini::Configuration &configuration)
 		Figures3D figures;
 		for (unsigned int i = 0; i < nrFigures; i++) {
 			const std::string figureName = "Figure" + std::to_string(i);
-			
 			figures.push_back(calculateFigure(figureName, configuration));
 		}
 		img::Color c(bgColor[0] * 255, bgColor[1] * 255, bgColor[2] * 255);
 		Vector3D eyePoint = Vector3D::point(eye[0], eye[1], eye[2]);
 		Matrix M = eyePointTrans(eyePoint);
 		applyTransformation(figures, M);
+		if (type == "ZBuffering") {
+			return drawFigures(figures, size, c);
+		}
 		Lines2D lines = doProjection(figures);
 		if (type == "ZBufferedWireframe") {
 			return draw2DLines(lines, size, c, true);
