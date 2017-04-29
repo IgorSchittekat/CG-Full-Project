@@ -16,7 +16,7 @@ void transform(Figure3D& fig, double scaleFactor, double angleX, double angleY,
   applyTransformation(fig, M);
 }
 
-Figure3D calculateFigure(const std::string& figureName, const ini::Configuration &configuration) {
+Figures3D calculateFigure(const std::string& figureName, const ini::Configuration &configuration) {
   Figure3D figure;
   const std::string type = configuration[figureName]["type"].as_string_or_die();
   const double scale = configuration[figureName]["scale"].as_double_or_die();
@@ -27,7 +27,6 @@ Figure3D calculateFigure(const std::string& figureName, const ini::Configuration
   const std::vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
   img::Color c(color[0] * 255, color[1] * 255, color[2] * 255);
   Vector3D centerVec = Vector3D::point(center[0], center[1], center[2]);
-
   if (type == "LineDrawing") {   
     const unsigned int nrPoints = configuration[figureName]["nrPoints"].as_int_or_die();
     const unsigned int nrLines = configuration[figureName]["nrLines"].as_int_or_die();
@@ -87,9 +86,44 @@ Figure3D calculateFigure(const std::string& figureName, const ini::Configuration
     const std::string inFile = configuration[figureName]["inputfile"].as_string_or_die();
     figure = LSystems3D(inFile, color);
   }
-  else {
-    return Figure3D();
+	else if (type == "BuckyBall") {
+		figure = createBuckyball(c);
+	}
+	else if (type.substr(0, 7) == "Fractal") {
+		const int nrIt = configuration[figureName]["nrIterations"].as_int_or_die();
+		const double fractalScale = configuration[figureName]["fractalScale"].as_double_or_die();
+		if (type == "FractalTetrahedron") {
+			figure = createTetrahedron(c);
+		}
+		else if (type == "FractalCube") {
+			figure = createCube(c);
+		}
+		else if (type == "FractalIcosahedron") {
+			figure = createIcosahedron(c);
+		}
+		else if (type == "FractalOctahedron") {
+			figure = createOctahedron(c);
+		}
+		else if (type == "FractalDodecahedron") {
+			figure = createDodecahedron(c);
+		}
+		else if (type == "FractalBuckyBall") {
+			figure = createBuckyball(c);
+		}
+		else {
+			return Figures3D();
+		}
+		Figures3D figures = generateFractal(figure, nrIt, fractalScale);
+		for (Figure3D& fig : figures) {
+			transform(fig, scale, rotateX, rotateY, rotateZ, centerVec);
+		}
+		return figures;
+	}
+	else {
+    return Figures3D();
   }
   transform(figure, scale, rotateX, rotateY, rotateZ, centerVec);
-  return figure;
+	Figures3D figures;
+	figures.push_back(figure);
+  return figures;
 }

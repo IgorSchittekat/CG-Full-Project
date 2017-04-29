@@ -26,7 +26,8 @@ img::EasyImage generate_image(const ini::Configuration &configuration)
 		Figures3D figures;
 		for (unsigned int i = 0; i < nrFigures; i++) {
 			const std::string figureName = "Figure" + std::to_string(i);
-			figures.push_back(calculateFigure(figureName, configuration));
+			Figures3D newFigures = calculateFigure(figureName, configuration);
+			figures.insert(figures.end(), newFigures.begin(), newFigures.end());
 		}
 		img::Color c(bgColor[0] * 255, bgColor[1] * 255, bgColor[2] * 255);
 		Vector3D eyePoint = Vector3D::point(eye[0], eye[1], eye[2]);

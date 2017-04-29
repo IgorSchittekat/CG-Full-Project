@@ -381,6 +381,47 @@ Figure3D createTorus(const double r, const double R, const int n, const int m, c
   return fig;
 }
 
+Figure3D createBuckyball(const img::Color& c) {
+	Figure3D ico = createIcosahedron(c);
+	/*
+	Face f0 = { 0, 1, 2, 3, 4, 5 };
+	Face f1 = { 5, 4, 6, 7, 8, 9 };
+	Face f2 = { 9, 8, 10, 11, 12, 13 };
+	Face f3 = { 13, 12, 14, 15, 16, 17 };
+	Face f4 = { 17, 16, 18, 19, 1, 0 };
+	Face f5 = { 20, 21, 22, 23, 3, 2 };
+	Face f6 = { 23, 22, 24, 25, 26, 27 };
+	Face f7 = { 27, 26, 28, 29, 7, 6 };
+	Face f8 = { 29, 1, 2, 3, 4, 5 };
+	Face f9 = { 0, 1, 2, 3, 4, 5 };
+	Face f10 = { 0, 1, 2, 3, 4, 5 };
+	Face f11 = { 0, 1, 2, 3, 4, 5 };
+	*/
+	Figure3D buckyball;
+	for (Face& face : ico.faces) {
+		Vector3D A = ico.points[face[0]];
+		Vector3D B = ico.points[face[1]];
+		Vector3D C = ico.points[face[2]];
+		Vector3D p0 = (A + B) / 3;
+		Vector3D p1 = (A + B) * 2 / 3;
+		Vector3D p2 = (B + C) / 3;
+		Vector3D p3 = (B + C) * 2 / 3;
+		Vector3D p4 = (C + A) / 3;
+		Vector3D p5 = (C + A) * 2 / 3;
+		int size = buckyball.points.size();
+		Face f = { size, size + 1, size + 2, size + 3, size + 4, size + 5 };
+		buckyball.points.push_back(p0);
+		buckyball.points.push_back(p1);
+		buckyball.points.push_back(p2);
+		buckyball.points.push_back(p3);
+		buckyball.points.push_back(p4);
+		buckyball.points.push_back(p5);
+		buckyball.faces.push_back(f);
+	}
+	buckyball.c = c;
+	return buckyball;
+}
+
 std::vector<Face> triangulate(const Face& face) {
 	std::vector<Face> faces;
 	if (face.size() < 3) {
@@ -429,4 +470,28 @@ img::EasyImage drawFigures(Figures3D& figures, int size, const img::Color& bgc) 
 		}
 	}
 	return image;
+}
+
+Figures3D generateFractal(Figure3D& fig, const int nrIt, const double scaleFactor) {
+	Figures3D fractal;
+	if (nrIt > 0) {
+		for (Vector3D corner : fig.points) {
+			Figure3D copy = fig;
+			Matrix M = scale(1 / (scaleFactor - 1));
+			applyTransformation(copy, M);
+			M = shift(corner);
+			applyTransformation(copy, M);
+			fractal.push_back(copy);
+		}
+		Figures3D newFractal;
+		for (Figure3D& figure : fractal) {
+			Figures3D returnValue = generateFractal(figure, nrIt - 1, scaleFactor);
+			newFractal.insert(newFractal.end(), returnValue.begin(), returnValue.end());
+		}
+		return newFractal;
+	}
+	else {
+		fractal.push_back(fig);
+	}
+	return fractal;
 }

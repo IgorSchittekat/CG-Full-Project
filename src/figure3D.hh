@@ -50,8 +50,11 @@ Figure3D createSphere(const int n, const img::Color& c);
 Figure3D createCone(const int n, const double h, const img::Color& c);
 Figure3D createCylinder(const int n, const double h, const img::Color& c);
 Figure3D createTorus(const double r, const double R, const int n, const int m, const img::Color& c);
+Figure3D createBuckyball(const img::Color& c);
 
 std::vector<Face> triangulate(const Face& face);
 img::EasyImage drawFigures(Figures3D& figures, int size, const img::Color& bgc);
+
+Figures3D generateFractal(Figure3D& fig, const int nrIt, const double scale);
 
 #endif // FIGURE3D_INCLUDED

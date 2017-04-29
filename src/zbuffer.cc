@@ -42,8 +42,8 @@ void ZBuffer::draw_zbuf_line(img::EasyImage& img, unsigned int x0, unsigned int 
 	Vector3D point1 = Vector3D::point(x1, y1, z1);
 	if (x0 == x1) {
 		//special case for x0 == x1
-		int ymin = std::min(y0, y1);
-		int ymax = std::max(y0, y1);
+		unsigned int ymin = std::min(y0, y1);
+		unsigned int ymax = std::max(y0, y1);
 		double zmin = (ymin == y0) ? z0 : z1;
 		double zmax = (ymax == y0) ? z0 : z1;
 		for (unsigned int i = std::min(y0, y1); i <= std::max(y0, y1); i++) {
@@ -63,8 +63,8 @@ void ZBuffer::draw_zbuf_line(img::EasyImage& img, unsigned int x0, unsigned int 
 		
 	else if (y0 == y1) {
 		//special case for y0 == y1
-		int xmin = std::min(x0, x1);
-		int xmax = std::max(x0, x1);
+		unsigned int xmin = std::min(x0, x1);
+		unsigned int xmax = std::max(x0, x1);
 		double zmin = (xmin == x0) ? z0 : z1;
 		double zmax = (xmax == x0) ? z0 : z1;
 
