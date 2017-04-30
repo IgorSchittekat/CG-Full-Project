@@ -40,6 +40,18 @@ img::EasyImage generate_image(const ini::Configuration &configuration)
 		if (type == "ZBufferedWireframe") {
 			return draw2DLines(lines, size, c, true);
 		}
+		else if (type == "LightedZBuffering") {
+			const unsigned int size = configuration["General"]["size"].as_int_or_die();
+			const std::vector<double> bgColor = configuration["General"]["backgroundcolor"].as_double_tuple_or_die();
+			const std::vector<double> eye = configuration["General"]["eye"].as_double_tuple_or_die();
+			const unsigned int nrFigures = configuration["General"]["nrFigures"].as_int_or_die();
+			for (unsigned int i = 0; i < nrFigures; i++) {
+				const std::string figureName = "Figure" + std::to_string(i);
+				Figures3D newFigures = calculateFigure(figureName, configuration);
+				figures.insert(figures.end(), newFigures.begin(), newFigures.end());
+			}
+			//const unsigned int nrLights;
+		}
 		else 
 			return draw2DLines(lines, size, c);
 	}

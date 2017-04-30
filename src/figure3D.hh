@@ -7,7 +7,6 @@
 #include "easy_image.hh"
 #include "zbuffer.hh"
 #include <vector>
-#pragma once
 
 class Point2D;
 class Line2D;

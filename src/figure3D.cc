@@ -399,15 +399,17 @@ Figure3D createBuckyball(const img::Color& c) {
 	*/
 	Figure3D buckyball;
 	for (Face& face : ico.faces) {
+		Vector3D p0, p1, p2, p3, p4, p5;
 		Vector3D A = ico.points[face[0]];
 		Vector3D B = ico.points[face[1]];
 		Vector3D C = ico.points[face[2]];
-		Vector3D p0 = (A + B) / 3;
-		Vector3D p1 = (A + B) * 2 / 3;
-		Vector3D p2 = (B + C) / 3;
-		Vector3D p3 = (B + C) * 2 / 3;
-		Vector3D p4 = (C + A) / 3;
-		Vector3D p5 = (C + A) * 2 / 3;
+		p5 = A * 2 / 3 + B / 3;
+		p4 = A / 3 + B * 2 / 3;
+		p3 = C / 3 + B * 2 / 3;
+		p2 = C * 2 / 3 + B / 3;
+		p1 = A / 3 + C * 2 / 3;
+		p0 = A * 2 / 3 + C / 3;
+		
 		int size = buckyball.points.size();
 		Face f = { size, size + 1, size + 2, size + 3, size + 4, size + 5 };
 		buckyball.points.push_back(p0);
