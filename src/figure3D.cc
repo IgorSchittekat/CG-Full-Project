@@ -475,11 +475,12 @@ img::EasyImage drawFigures(Figures3D& figures, int size, const img::Color& bgc) 
 Figures3D generateFractal(Figure3D& fig, const int nrIt, const double scaleFactor) {
 	Figures3D fractal;
 	if (nrIt > 0) {
-		for (Vector3D corner : fig.points) {
+		for (int i = 0; i < fig.points.size(); i++) {
+			Vector3D corner = fig.points[i];
 			Figure3D copy = fig;
-			Matrix M = scale(1 / (scaleFactor - 1));
+			Matrix M = scale(1 / (scaleFactor));
 			applyTransformation(copy, M);
-			M = shift(corner);
+			M = shift(corner - copy.points[i]);
 			applyTransformation(copy, M);
 			fractal.push_back(copy);
 		}
