@@ -114,7 +114,7 @@ Lines2D doProjection(const Figures3D & figures) {
           line.z1 = fig.points[face[i]].z;
           line.z2 = fig.points[face[0]].z;
         }
-				img::Color color(fig.ambientReflection.at(0), fig.ambientReflection.at(1), fig.ambientReflection.at(2));
+				img::Color color(fig.ambientReflection.at(0) * 255, fig.ambientReflection.at(1) * 255, fig.ambientReflection.at(2) * 255);
         line.c = color;
         l.push_back(line);
       }      
