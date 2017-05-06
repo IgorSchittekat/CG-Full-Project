@@ -89,9 +89,8 @@ img::EasyImage drawLSystem(std::string lString, const LParser::LSystem2D& lSyste
   return draw2DLines(lines, size, bgc);
 }
 
-Figure3D drawLSystem(std::string lString, const LParser::LSystem3D& lSystem, const img::Color& c){
+Figure3D drawLSystem(std::string lString, const LParser::LSystem3D& lSystem){
   Figure3D fig;
-  fig.c = c;
   const std::set<char> alphabet = lSystem.get_alphabet();
   const double angle = lSystem.get_angle();
   Vector3D turtle = Vector3D::point(0, 0, 0);
@@ -193,7 +192,7 @@ img::EasyImage LSystems2D(int size, const std::vector<double> &bgColor, const st
   return drawLSystem(lString, lSystem, c, size, bgc);
 }
 
-Figure3D LSystems3D(const std::string &inFile, const std::vector<double>& color){
+Figure3D LSystems3D(const std::string &inFile){
   LParser::LSystem3D lSystem;
   std::ifstream file(inFile);
   if (!file.is_open()) {
@@ -204,6 +203,5 @@ Figure3D LSystems3D(const std::string &inFile, const std::vector<double>& color)
   file.close();
 
   std::string lString = calculateLSystem(lSystem);
-  img::Color c(color[0] * 255, color[1] * 255, color[2] * 255);
-  return drawLSystem(lString, lSystem, c);
+  return drawLSystem(lString, lSystem);
 }

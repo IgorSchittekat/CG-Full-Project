@@ -132,7 +132,8 @@ void intersection(double& xI1, double& xI2, double yI, double xP, double yP, dou
 }
 
 void ZBuffer::draw_zbuf_triag(img::EasyImage& img, const Vector3D& A, const Vector3D& B, const Vector3D& C,
-	double d, double dx, double dy, img::Color color) {
+	double d, double dx, double dy, LightColor ambientReflection, LightColor diffuseReflection,
+	LightColor specularReflection, double reflectionCoeff, Lights3D& lights) {
 	Point2D pA((d * A.x) / (-A.z) + dx, (d * A.y) / (-A.z) + dy);
 	Point2D pB((d * B.x) / (-B.z) + dx, (d * B.y) / (-B.z) + dy);
 	Point2D pC((d * C.x) / (-C.z) + dx, (d * C.y) / (-C.z) + dy);
@@ -145,6 +146,10 @@ void ZBuffer::draw_zbuf_triag(img::EasyImage& img, const Vector3D& A, const Vect
 	double k = (w.x * A.x) + (w.y * A.y) + (w.z * A.z);
 	double dzdx = w.x / (-d * k);
 	double dzdy = w.y / (-d * k);
+
+	LightColor colorVec = ambient(lights, ambientReflection);
+	img::Color color(colorVec[0] * 255, colorVec[1] * 255, colorVec[2] * 255);
+
 
 	int yMin = roundToInt(std::min({ pA.y, pB.y, pC.y }) + 0.5);
 	int yMax = roundToInt(std::max({ pA.y, pB.y, pC.y }) - 0.5);

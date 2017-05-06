@@ -6,6 +6,7 @@
 #include "figure3D.hh"
 #include "figure2D.hh"
 #include "vector.hh"
+#include "light.hh"
 
 class Point2D;
 
@@ -19,8 +20,9 @@ public:
 	void setBuffer(const unsigned int x, const unsigned int y, double value);
 	void draw_zbuf_line(img::EasyImage& img, const unsigned int x0, const unsigned int y0, 
 		const double z0, const unsigned int x1, const unsigned int y1, const double z1, const img::Color& c);
-	void draw_zbuf_triag(img::EasyImage&, const Vector3D& A, const Vector3D& B, const Vector3D& C,
-		double d, double dx, double dy, img::Color color);
+	void draw_zbuf_triag(img::EasyImage& img, const Vector3D& A, const Vector3D& B, const Vector3D& C,
+		double d, double dx, double dy, LightColor ambientReflection, LightColor diffuseReflection, 
+		LightColor specularReflection, double reflectionCoeff, Lights3D& lights);
 };
 
 

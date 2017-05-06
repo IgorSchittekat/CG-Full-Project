@@ -2,6 +2,7 @@
 #include "wireframe.hh"
 #include "ini_configuration.hh"
 #include "figure3D.hh"
+#include "light.hh"
 
 #include <fstream>
 #include <iostream>
@@ -24,36 +25,50 @@ img::EasyImage generate_image(const ini::Configuration &configuration)
 		const unsigned int nrFigures = configuration["General"]["nrFigures"].as_int_or_die();
 		const std::vector<double> eye = configuration["General"]["eye"].as_double_tuple_or_die();
 		Figures3D figures;
+		Lights3D lights;
+		lights.push_back(calculateLight("", configuration));
 		for (unsigned int i = 0; i < nrFigures; i++) {
 			const std::string figureName = "Figure" + std::to_string(i);
 			Figures3D newFigures = calculateFigure(figureName, configuration);
 			figures.insert(figures.end(), newFigures.begin(), newFigures.end());
 		}
-		img::Color c(bgColor[0] * 255, bgColor[1] * 255, bgColor[2] * 255);
+		img::Color bgc(bgColor[0] * 255, bgColor[1] * 255, bgColor[2] * 255);
 		Vector3D eyePoint = Vector3D::point(eye[0], eye[1], eye[2]);
 		Matrix M = eyePointTrans(eyePoint);
 		applyTransformation(figures, M);
 		if (type == "ZBuffering") {
-			return drawFigures(figures, size, c);
+			return drawFigures(figures, size, bgc, lights);
 		}
 		Lines2D lines = doProjection(figures);
 		if (type == "ZBufferedWireframe") {
-			return draw2DLines(lines, size, c, true);
+			return draw2DLines(lines, size, bgc, true);
 		}
-		else if (type == "LightedZBuffering") {
-			const unsigned int size = configuration["General"]["size"].as_int_or_die();
-			const std::vector<double> bgColor = configuration["General"]["backgroundcolor"].as_double_tuple_or_die();
-			const std::vector<double> eye = configuration["General"]["eye"].as_double_tuple_or_die();
-			const unsigned int nrFigures = configuration["General"]["nrFigures"].as_int_or_die();
-			for (unsigned int i = 0; i < nrFigures; i++) {
-				const std::string figureName = "Figure" + std::to_string(i);
-				Figures3D newFigures = calculateFigure(figureName, configuration);
-				figures.insert(figures.end(), newFigures.begin(), newFigures.end());
-			}
-			//const unsigned int nrLights;
+		else {
+			return draw2DLines(lines, size, bgc);
 		}
-		else 
-			return draw2DLines(lines, size, c);
+	}
+	else if (type == "LightedZBuffering") {
+		const unsigned int size = configuration["General"]["size"].as_int_or_die();
+		const std::vector<double> bgColor = configuration["General"]["backgroundcolor"].as_double_tuple_or_die();
+		const std::vector<double> eye = configuration["General"]["eye"].as_double_tuple_or_die();
+		const unsigned int nrFigures = configuration["General"]["nrFigures"].as_int_or_die();
+		Figures3D figures;
+		Lights3D lights;
+		const unsigned int nrLights = configuration["General"]["nrLights"].as_int_or_die();
+		for (uint i = 0; i < nrLights; i++) {
+			const std::string lightName = "Light" + std::to_string(i);
+			lights.push_back(calculateLight(lightName, configuration));
+		}
+		for (unsigned int i = 0; i < nrFigures; i++) {
+			const std::string figureName = "Figure" + std::to_string(i);
+			Figures3D newFigures = calculateFigure(figureName, configuration);
+			figures.insert(figures.end(), newFigures.begin(), newFigures.end());
+		}
+		img::Color bgc(bgColor[0] * 255, bgColor[1] * 255, bgColor[2] * 255);
+		Vector3D eyePoint = Vector3D::point(eye[0], eye[1], eye[2]);
+		Matrix M = eyePointTrans(eyePoint);
+		applyTransformation(figures, M);
+		return drawFigures(figures, size, bgc, lights);
 	}
 	return img::EasyImage();
 }
