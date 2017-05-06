@@ -13,6 +13,8 @@ public:
 	LightColor ambientLight;
 	LightColor diffuseLight;
 	LightColor specularLight;
+	Vector3D direction;
+	bool infinity;
 };
 
 typedef std::vector<Light> Lights3D;
@@ -21,6 +23,7 @@ typedef Vector3D location;
 
 Light calculateLight(const std::string& lightname, const ini::Configuration &configuration);
 LightColor ambient(Lights3D& lights, LightColor ambientReflection);
+LightColor diffuse(Lights3D& lights, LightColor diffuseReflection, Vector3D& n);
 
 
 #endif /* LIGHT_INCLUDED */

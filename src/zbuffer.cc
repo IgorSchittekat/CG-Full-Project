@@ -146,8 +146,15 @@ void ZBuffer::draw_zbuf_triag(img::EasyImage& img, const Vector3D& A, const Vect
 	double k = (w.x * A.x) + (w.y * A.y) + (w.z * A.z);
 	double dzdx = w.x / (-d * k);
 	double dzdy = w.y / (-d * k);
+	
+	Vector3D n = Vector3D::normalise(w);
+	
+	LightColor ambientColor = ambient(lights, ambientReflection);
+	LightColor diffuseColor = diffuse(lights, diffuseReflection, n);
 
-	LightColor colorVec = ambient(lights, ambientReflection);
+	LightColor colorVec = { ambientColor.at(0) + diffuseColor.at(0),
+		ambientColor.at(1) + diffuseColor.at(1),
+		ambientColor.at(2) + diffuseColor.at(2) };
 	img::Color color(colorVec[0] * 255, colorVec[1] * 255, colorVec[2] * 255);
 
 

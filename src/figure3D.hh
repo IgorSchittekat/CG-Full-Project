@@ -61,5 +61,6 @@ std::vector<Face> triangulate(const Face& face);
 img::EasyImage drawFigures(Figures3D& figures, int size, const img::Color& bgc, Lights3D lights);
 
 Figures3D generateFractal(Figure3D& fig, const int nrIt, const double scale);
+Vector3D normalise(Face& face);
 
 #endif // FIGURE3D_INCLUDED

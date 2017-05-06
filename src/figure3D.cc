@@ -319,7 +319,7 @@ Figure3D createCone(const int n, const double h) {
     if (i != n - 1)
       f = { i, i + 1, n };
     else
-      f = { 0, i, n };
+      f = { i, 0, n };
     fig.faces.push_back(f);
     fn.insert(fn.begin(), i);
   }
@@ -369,7 +369,7 @@ Figure3D createTorus(const double r, const double R, const int n, const int m) {
   }
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < m; j++) {
-      Face f = { m * i + j, m * ((i + 1) % n) + j, m * ((i + 1) % n) + (j + 1) % m, m * i + (j + 1) % m };
+			Face f = { m * i + j, m * ((i + 1) % n) + j, m * ((i + 1) % n) + (j + 1) % m, m * i + (j + 1) % m };
       fig.faces.push_back(f);
     }
   }
@@ -398,12 +398,12 @@ Figure3D createBuckyball() {
 		Vector3D A = ico.points[face[0]];
 		Vector3D B = ico.points[face[1]];
 		Vector3D C = ico.points[face[2]];
-		p5 = A * 2 / 3 + B / 3;
-		p4 = A / 3 + B * 2 / 3;
-		p3 = C / 3 + B * 2 / 3;
-		p2 = C * 2 / 3 + B / 3;
-		p1 = A / 3 + C * 2 / 3;
-		p0 = A * 2 / 3 + C / 3;
+		p0 = A * 2 / 3 + B / 3;
+		p1 = A / 3 + B * 2 / 3;
+		p2 = C / 3 + B * 2 / 3;
+		p3 = C * 2 / 3 + B / 3;
+		p4 = A / 3 + C * 2 / 3;
+		p5 = A * 2 / 3 + C / 3;
 		
 		int size = buckyball.points.size();
 		Face f = { size, size + 1, size + 2, size + 3, size + 4, size + 5 };
@@ -493,4 +493,8 @@ Figures3D generateFractal(Figure3D& fig, const int nrIt, const double scaleFacto
 		fractal.push_back(fig);
 	}
 	return fractal;
+}
+
+Vector3D normalise(Face& face) {
+
 }

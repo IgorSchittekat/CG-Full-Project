@@ -27,8 +27,10 @@ Figures3D calculateFigure(const std::string& figureName, const ini::Configuratio
 	const std::vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
 	Vector3D centerVec = Vector3D::point(center[0], center[1], center[2]);
 	LightColor ambientReflection;
+	LightColor diffuseReflection;
 	configuration[figureName]["color"].as_double_tuple_if_exists(ambientReflection);
 	ambientReflection = configuration[figureName]["ambientReflection"].as_double_tuple_or_default(ambientReflection);
+	diffuseReflection = configuration[figureName]["diffuseReflection"].as_double_tuple_or_default(ambientReflection);
 	configuration[figureName]["diffuseReflection"].as_double_tuple_if_exists(figure.diffuseReflection);
 	configuration[figureName]["specularReflection"].as_double_tuple_if_exists(figure.specularReflection);
   if (type == "LineDrawing") {   
@@ -117,6 +119,7 @@ Figures3D calculateFigure(const std::string& figureName, const ini::Configuratio
 			return Figures3D();
 		}
 		figure.ambientReflection = ambientReflection;
+		figure.diffuseReflection = diffuseReflection;
 		Figures3D figures = generateFractal(figure, nrIt, fractalScale);
 		for (Figure3D& fig : figures) {
 			transform(fig, scale, rotateX, rotateY, rotateZ, centerVec);
@@ -127,6 +130,7 @@ Figures3D calculateFigure(const std::string& figureName, const ini::Configuratio
     return Figures3D();
   }
 	figure.ambientReflection = ambientReflection;
+	figure.diffuseReflection = diffuseReflection;
   transform(figure, scale, rotateX, rotateY, rotateZ, centerVec);
 	Figures3D figures;
 	figures.push_back(figure);
