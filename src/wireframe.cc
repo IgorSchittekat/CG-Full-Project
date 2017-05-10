@@ -3,20 +3,6 @@
 #include "lSystem.hh"
 #include <iostream>
 
-void transform(Figure3D& fig, double scaleFactor, double angleX, double angleY,
-  double angleZ, const Vector3D& center) {
-  Matrix M = scale(scaleFactor);
-  
-  if (angleX != 0)
-    M *= rotateX(angleX);
-  if (angleY != 0)
-    M *= rotateY(angleY);
-  if (angleZ != 0)
-    M *= rotateZ(angleZ);
-  M *= shift(center);
-  applyTransformation(fig, M);
-}
-
 Figures3D calculateFigure(const std::string& figureName, const ini::Configuration &configuration) {
   Figure3D figure;
   const std::string type = configuration[figureName]["type"].as_string_or_die();
@@ -27,12 +13,11 @@ Figures3D calculateFigure(const std::string& figureName, const ini::Configuratio
 	const std::vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
 	Vector3D centerVec = Vector3D::point(center[0], center[1], center[2]);
 	LightColor ambientReflection;
-	LightColor diffuseReflection;
 	configuration[figureName]["color"].as_double_tuple_if_exists(ambientReflection);
 	ambientReflection = configuration[figureName]["ambientReflection"].as_double_tuple_or_default(ambientReflection);
-	diffuseReflection = configuration[figureName]["diffuseReflection"].as_double_tuple_or_default(ambientReflection);
-	configuration[figureName]["diffuseReflection"].as_double_tuple_if_exists(figure.diffuseReflection);
-	configuration[figureName]["specularReflection"].as_double_tuple_if_exists(figure.specularReflection);
+	LightColor diffuseReflection = configuration[figureName]["diffuseReflection"].as_double_tuple_or_default(ambientReflection);
+	LightColor specularReflection = configuration[figureName]["specularReflection"].as_double_tuple_or_default(ambientReflection);
+	double reflectionCoeff = configuration[figureName]["reflectionCoefficient"].as_double_or_default(0);
   if (type == "LineDrawing") {   
     const uint nrPoints = configuration[figureName]["nrPoints"].as_int_or_die();
     const uint nrLines = configuration[figureName]["nrLines"].as_int_or_die();
@@ -94,6 +79,21 @@ Figures3D calculateFigure(const std::string& figureName, const ini::Configuratio
 	else if (type == "BuckyBall") {
 		figure = createBuckyball();
 	}
+	else if (type == "Mobiusband") {
+		const unsigned int m = configuration[figureName]["m"].as_int_or_die();
+		const unsigned int n = configuration[figureName]["n"].as_int_or_die();
+		figure = createMobiusband(m, n);
+	}
+	else if (type == "Neveltorus") {
+		const unsigned int m = configuration[figureName]["m"].as_int_or_die();
+		const unsigned int n = configuration[figureName]["n"].as_int_or_die();
+		figure = createNeveltorus(m, n);
+	}
+	else if (type == "Zandloper") {
+		const unsigned int n = configuration[figureName]["n"].as_int_or_die();
+		const double h = configuration[figureName]["height"].as_double_or_die();
+		figure = createZandloper(n, h);
+	}
 	else if (type.substr(0, 7) == "Fractal") {
 		const int nrIt = configuration[figureName]["nrIterations"].as_int_or_die();
 		const double fractalScale = configuration[figureName]["fractalScale"].as_double_or_die();
@@ -120,8 +120,42 @@ Figures3D calculateFigure(const std::string& figureName, const ini::Configuratio
 		}
 		figure.ambientReflection = ambientReflection;
 		figure.diffuseReflection = diffuseReflection;
+		figure.specularReflection = specularReflection;
+		figure.reflectionCoefficient = reflectionCoeff;
 		Figures3D figures = generateFractal(figure, nrIt, fractalScale);
 		for (Figure3D& fig : figures) {
+			transform(fig, scale, rotateX, rotateY, rotateZ, centerVec);
+		}
+		return figures;
+	}
+	else if (type.substr(0, 5) == "Thick") {
+		const double m = configuration[figureName]["m"].as_double_or_die();
+		const double n = configuration[figureName]["n"].as_double_or_die();
+		const double r = configuration[figureName]["radius"].as_double_or_die();
+		if (type == "ThickTetrahedron") {
+			figure = createTetrahedron();
+		}
+		else if (type == "ThickCube") {
+			figure = createCube();
+		}
+		else if (type == "ThickIcosahedron") {
+			figure = createIcosahedron();
+		}
+		else if (type == "ThickOctahedron") {
+			figure = createOctahedron();
+		}
+		else if (type == "ThickDodecahedron") {
+			figure = createDodecahedron();
+		}
+		else if (type == "ThickBuckyBall") {
+			figure = createBuckyball();
+		}
+		Figures3D figures = generateThickFigure(figure, r, n, m);
+		for (Figure3D& fig : figures) {
+			fig.ambientReflection = ambientReflection;
+			fig.diffuseReflection = diffuseReflection;
+			fig.specularReflection = specularReflection;
+			fig.reflectionCoefficient = reflectionCoeff;
 			transform(fig, scale, rotateX, rotateY, rotateZ, centerVec);
 		}
 		return figures;
@@ -131,6 +165,8 @@ Figures3D calculateFigure(const std::string& figureName, const ini::Configuratio
   }
 	figure.ambientReflection = ambientReflection;
 	figure.diffuseReflection = diffuseReflection;
+	figure.specularReflection = specularReflection;
+	figure.reflectionCoefficient = reflectionCoeff;
   transform(figure, scale, rotateX, rotateY, rotateZ, centerVec);
 	Figures3D figures;
 	figures.push_back(figure);

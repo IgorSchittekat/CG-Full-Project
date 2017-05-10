@@ -37,6 +37,8 @@ Matrix rotateX(const double angle);
 Matrix rotateY(const double angle);
 Matrix rotateZ(const double angle);
 Matrix shift(const Vector3D& vector);
+void transform(Figure3D& fig, double scaleFactor, double angleX, double angleY,
+	double angleZ, const Vector3D& center);
 
 void toPolar(const Vector3D& point, double& theta, double& phi, double& r);
 Matrix eyePointTrans(const Vector3D& eyepoint);
@@ -53,14 +55,17 @@ Figure3D createDodecahedron();
 Figure3D createOctahedron();
 Figure3D createSphere(const int n);
 Figure3D createCone(const int n, const double h);
-Figure3D createCylinder(const int n, const double h);
+Figure3D createCylinder(const int n, const double h, bool genTAndB = true);
 Figure3D createTorus(const double r, const double R, const int n, const int m);
 Figure3D createBuckyball();
+Figure3D createNeveltorus(const int n, const int m);
+Figure3D createMobiusband(const int n, const int m);
+Figure3D createZandloper(const int n, const double h);
 
 std::vector<Face> triangulate(const Face& face);
-img::EasyImage drawFigures(Figures3D& figures, int size, const img::Color& bgc, Lights3D lights);
+img::EasyImage drawFigures(Figures3D& figures, int size, const img::Color& bgc, Lights3D& lights, Vector3D& eye);
 
 Figures3D generateFractal(Figure3D& fig, const int nrIt, const double scale);
-Vector3D normalise(Face& face);
+Figures3D generateThickFigure(Figure3D& fig, const double r, const int n, const int m);
 
 #endif // FIGURE3D_INCLUDED

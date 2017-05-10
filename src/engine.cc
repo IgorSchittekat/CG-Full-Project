@@ -37,7 +37,7 @@ img::EasyImage generate_image(const ini::Configuration &configuration)
 		Matrix M = eyePointTrans(eyePoint);
 		applyTransformation(figures, M);
 		if (type == "ZBuffering") {
-			return drawFigures(figures, size, bgc, lights);
+			return drawFigures(figures, size, bgc, lights, eyePoint);
 		}
 		Lines2D lines = doProjection(figures);
 		if (type == "ZBufferedWireframe") {
@@ -68,7 +68,8 @@ img::EasyImage generate_image(const ini::Configuration &configuration)
 		Vector3D eyePoint = Vector3D::point(eye[0], eye[1], eye[2]);
 		Matrix M = eyePointTrans(eyePoint);
 		applyTransformation(figures, M);
-		return drawFigures(figures, size, bgc, lights);
+		eyePoint *= M;
+		return drawFigures(figures, size, bgc, lights, eyePoint);
 	}
 	return img::EasyImage();
 }

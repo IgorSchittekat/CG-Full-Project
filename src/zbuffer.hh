@@ -22,7 +22,7 @@ public:
 		const double z0, const unsigned int x1, const unsigned int y1, const double z1, const img::Color& c);
 	void draw_zbuf_triag(img::EasyImage& img, const Vector3D& A, const Vector3D& B, const Vector3D& C,
 		double d, double dx, double dy, LightColor ambientReflection, LightColor diffuseReflection, 
-		LightColor specularReflection, double reflectionCoeff, Lights3D& lights);
+		LightColor specularReflection, double reflectionCoeff, Lights3D& lights, Vector3D& eye);
 };
 
 

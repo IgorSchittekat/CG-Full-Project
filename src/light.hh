@@ -14,6 +14,7 @@ public:
 	LightColor diffuseLight;
 	LightColor specularLight;
 	Vector3D direction;
+	Vector3D location;
 	bool infinity;
 };
 
@@ -22,8 +23,10 @@ typedef Vector3D ldVector;
 typedef Vector3D location;
 
 Light calculateLight(const std::string& lightname, const ini::Configuration &configuration);
-LightColor ambient(Lights3D& lights, LightColor ambientReflection);
-LightColor diffuse(Lights3D& lights, LightColor diffuseReflection, Vector3D& n);
+LightColor ambient(Lights3D& lights, LightColor& ambientReflection);
+LightColor diffuse(Lights3D& lights, LightColor& diffuseReflection, Vector3D& n, Vector3D& point);
+LightColor specular(Lights3D& lights, LightColor& specularReflection, double reflectionCoeff,
+	Vector3D& n, Vector3D& point, Vector3D& eye);
 
 
 #endif /* LIGHT_INCLUDED */
