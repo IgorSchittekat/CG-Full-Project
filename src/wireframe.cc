@@ -150,6 +150,10 @@ Figures3D calculateFigure(const std::string& figureName, const ini::Configuratio
 		else if (type == "ThickBuckyBall") {
 			figure = createBuckyball();
 		}
+		else if (type == "Thick3DLSystem") {
+			const std::string inFile = configuration[figureName]["inputfile"].as_string_or_die();
+			figure = LSystems3D(inFile);
+		}
 		Figures3D figures = generateThickFigure(figure, r, n, m);
 		for (Figure3D& fig : figures) {
 			fig.ambientReflection = ambientReflection;

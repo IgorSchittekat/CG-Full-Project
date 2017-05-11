@@ -589,8 +589,8 @@ Figures3D generateThickFigure(Figure3D& fig, const double r, const int n, const 
 			double theta, phi, a;
 			toPolar(p0p1, theta, phi, a);
 			Matrix M = scale(r);
-			M *= rotateY(phi);
-			M *= rotateZ(theta);
+			M *= rotateY(phi / PI * 180);
+			M *= rotateZ(theta / PI * 180);
 			M *= shift(p0);
 			applyTransformation(cilinder, M);
 			figures.push_back(cilinder);
