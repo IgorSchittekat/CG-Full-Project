@@ -19,8 +19,6 @@ public:
 };
 
 typedef std::vector<Light> Lights3D;
-typedef Vector3D ldVector;
-typedef Vector3D location;
 
 Light calculateLight(const std::string& lightname, const ini::Configuration &configuration);
 LightColor ambient(Lights3D& lights, LightColor& ambientReflection);
