@@ -11,9 +11,9 @@ std::string calculateLSystem(const LParser::LSystem2D& lSystem);
 std::string calculateLSystem(const LParser::LSystem3D& lSystem);
 img::EasyImage drawLSystem(std::string lString, const LParser::LSystem2D& lSystem, 
   const img::Color& c, int size, const img::Color& bgc);
-Figure3D drawLSystem(std::string lString, const LParser::LSystem3D& lSystem, const img::Color& c);
+Figure3D drawLSystem(std::string lString, const LParser::LSystem3D& lSystem);
 img::EasyImage LSystems2D(int size, const std::vector<double> &bgColor, 
   const std::string &inFile, const std::vector<double> &color);
-Figure3D LSystems3D(const std::string &inFile, const std::vector<double>& color);
+Figure3D LSystems3D(const std::string &inFile);
 
 #endif // L_SYSTEM_INCLUDED

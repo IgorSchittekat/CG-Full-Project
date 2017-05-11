@@ -3,14 +3,14 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
+#include <set>
 
 #define PI 3.141592653589793238463
 #define TAU 6.283185307179586476925
 
-Figure3D::Figure3D(std::vector<Vector3D> points, std::vector<Face> faces, img::Color c) :
+Figure3D::Figure3D(std::vector<Vector3D> points, std::vector<Face> faces) :
   points(points),
-  faces(faces),
-  c(c) {
+  faces(faces) {
 }
 
 Matrix scale(const double scaleFactor) {
@@ -56,10 +56,24 @@ Matrix shift(const Vector3D & vec) {
   return m;
 }
 
+void transform(Figure3D& fig, double scaleFactor, double angleX, double angleY,
+	double angleZ, const Vector3D& center) {
+	Matrix M = scale(scaleFactor);
+
+	if (angleX != 0)
+		M *= rotateX(angleX);
+	if (angleY != 0)
+		M *= rotateY(angleY);
+	if (angleZ != 0)
+		M *= rotateZ(angleZ);
+	M *= shift(center);
+	applyTransformation(fig, M);
+}
+
 void toPolar(const Vector3D& p, double &theta, double &phi, double &r) {
   r = std::sqrt(std::pow(p.x, 2) + std::pow(p.y, 2) + std::pow(p.z, 2));
-  theta = std::atan2(p.y, p.x); // in rad
-  phi = std::acos(p.z / r); // in rad
+  theta = std::atan2(p.y, p.x);
+  phi = std::acos(p.z / r);
 }
 
 Matrix eyePointTrans(const Vector3D& eyepoint) {
@@ -101,7 +115,7 @@ Lines2D doProjection(const Figures3D & figures) {
   Lines2D l;
   for (const Figure3D& fig : figures) {
     for (const Face& face : fig.faces) {
-      for (int i=0; i<face.size(); i++){
+      for (uint i=0; i<face.size(); i++){
         Line2D line;
         if (i != face.size()-1){
           line.p1 = doProjection(fig.points[face[i]]);
@@ -115,7 +129,8 @@ Lines2D doProjection(const Figures3D & figures) {
           line.z1 = fig.points[face[i]].z;
           line.z2 = fig.points[face[0]].z;
         }
-        line.c = fig.c;
+				img::Color color(fig.ambientReflection.at(0) * 255, fig.ambientReflection.at(1) * 255, fig.ambientReflection.at(2) * 255);
+        line.c = color;
         l.push_back(line);
       }      
     }
@@ -123,7 +138,7 @@ Lines2D doProjection(const Figures3D & figures) {
   return l;
 }
 
-Figure3D createCube(const img::Color& c){
+Figure3D createCube(){
   Vector3D p0 = Vector3D::point(1, -1, -1);
   Vector3D p1 = Vector3D::point(-1, 1, -1);
   Vector3D p2 = Vector3D::point(1, 1, 1);
@@ -155,11 +170,10 @@ Figure3D createCube(const img::Color& c){
   fig.faces.push_back(f3);
   fig.faces.push_back(f4);
   fig.faces.push_back(f5);
-  fig.c = c;
   return fig;
 }
 
-Figure3D createTetrahedron(const img::Color& c) {
+Figure3D createTetrahedron() {
   Vector3D p0 = Vector3D::point(1, -1, -1);
   Vector3D p1 = Vector3D::point( -1, 1, -1 );
   Vector3D p2 = Vector3D::point( 1, 1, 1 );
@@ -178,11 +192,10 @@ Figure3D createTetrahedron(const img::Color& c) {
   fig.faces.push_back(f1);
   fig.faces.push_back(f2);
   fig.faces.push_back(f3);
-  fig.c = c;
   return fig;
 }
 
-Figure3D createIcosahedron(const img::Color& c) { 
+Figure3D createIcosahedron() { 
   Vector3D p0 = Vector3D::point(0, 0, std::sqrt(5) / 2);
   Vector3D p1 = Vector3D::point(1, 0, 0.5);
   Vector3D p2 = Vector3D::point(std::cos(TAU / 5), std::sin(TAU / 5), 0.5);
@@ -218,13 +231,13 @@ Figure3D createIcosahedron(const img::Color& c) {
   Face f19 = { 11, 6, 10 };
 
   Figure3D fig({ p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11 },
-  { f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19 }, c);
+  { f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19 });
 
   return fig;
 }
 
-Figure3D createDodecahedron(const img::Color& c) {
-  Figure3D ico = createIcosahedron(c);
+Figure3D createDodecahedron() {
+  Figure3D ico = createIcosahedron();
   Face f0 = { 0, 1, 2, 3, 4 };
   Face f1 = { 0, 5, 6, 7, 1 };
   Face f2 = { 1, 7, 8, 9, 2 };
@@ -238,7 +251,7 @@ Figure3D createDodecahedron(const img::Color& c) {
   Face f10 = { 16, 8, 7, 6, 15 };
   Face f11 = { 15, 6, 5, 14, 19 };
 
-  Figure3D dod({}, { f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11 }, c);
+  Figure3D dod({}, { f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11 });
   for (Face face : ico.faces) {
     const Vector3D A = ico.points[face[0]];
     const Vector3D B = ico.points[face[1]];
@@ -249,7 +262,7 @@ Figure3D createDodecahedron(const img::Color& c) {
   return dod;
 }
 
-Figure3D createOctahedron(const img::Color& c) {
+Figure3D createOctahedron() {
   Vector3D p0 = Vector3D::point(1, 0, 0);
   Vector3D p1 = Vector3D::point(0, 1, 0);
   Vector3D p2 = Vector3D::point(-1, 0, 0);
@@ -266,7 +279,7 @@ Figure3D createOctahedron(const img::Color& c) {
   Face f6 = { 3, 2, 4 };
   Face f7 = { 0, 3, 4 };
 
-  Figure3D fig({ p0, p1, p2, p3, p4, p5 }, { f0, f1, f2, f3, f4, f5, f6, f7 }, c);
+  Figure3D fig({ p0, p1, p2, p3, p4, p5 }, { f0, f1, f2, f3, f4, f5, f6, f7 });
   return fig;
 }
 
@@ -301,8 +314,8 @@ void splitIcosahedron(Figure3D& fig) {
   fig.faces = newFaces;
 }
 
-Figure3D createSphere(const int n, const img::Color& c) {
-  Figure3D ico = createIcosahedron(c);
+Figure3D createSphere(const int n) {
+  Figure3D ico = createIcosahedron();
   for (int i = 0; i < n; i++) {
     splitIcosahedron(ico);
   }
@@ -312,9 +325,8 @@ Figure3D createSphere(const int n, const img::Color& c) {
   return ico;
 }
 
-Figure3D createCone(const int n, const double h, const img::Color& c) {
+Figure3D createCone(const int n, const double h) {
   Figure3D fig;
-  fig.c = c;
   Face fn, f;
   for (int i = 0; i < n; i++) {
     Vector3D p = Vector3D::point(std::cos(i * TAU / n), std::sin(i * TAU / n), 0);
@@ -322,7 +334,7 @@ Figure3D createCone(const int n, const double h, const img::Color& c) {
     if (i != n - 1)
       f = { i, i + 1, n };
     else
-      f = { 0, i, n };
+      f = { i, 0, n };
     fig.faces.push_back(f);
     fn.insert(fn.begin(), i);
   }
@@ -332,9 +344,8 @@ Figure3D createCone(const int n, const double h, const img::Color& c) {
   return fig;
 }
 
-Figure3D createCylinder(const int n, const double h, const img::Color& c) {
+Figure3D createCylinder(const int n, const double h, bool genTAndB) {
   Figure3D fig;
-  fig.c = c;
   for (int i = 0; i < n; i++) {
     Vector3D p = Vector3D::point(std::cos(i * TAU / n), std::sin(i * TAU / n), 0);
     fig.points.push_back(p);
@@ -353,14 +364,15 @@ Figure3D createCylinder(const int n, const double h, const img::Color& c) {
     f1.insert(f1.begin(), i);
     f2.push_back(i + n);
   }
-  fig.faces.push_back(f1);
-  fig.faces.push_back(f2);
+	if (genTAndB) {
+		fig.faces.push_back(f1);
+		fig.faces.push_back(f2);
+	}
   return fig;
 }
 
-Figure3D createTorus(const double r, const double R, const int n, const int m, const img::Color& c) {
+Figure3D createTorus(const double r, const double R, const int n, const int m) {
   Figure3D fig;
-  fig.c = c;
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < m; j++) {
       double u = TAU * i / n;
@@ -374,40 +386,100 @@ Figure3D createTorus(const double r, const double R, const int n, const int m, c
   }
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < m; j++) {
-      Face f = { m * i + j, m * ((i + 1) % n) + j, m * ((i + 1) % n) + (j + 1) % m, m * i + (j + 1) % m };
+			Face f = { m * i + j, m * ((i + 1) % n) + j, m * ((i + 1) % n) + (j + 1) % m, m * i + (j + 1) % m };
       fig.faces.push_back(f);
     }
   }
   return fig;
 }
 
-Figure3D createBuckyball(const img::Color& c) {
-	Figure3D ico = createIcosahedron(c);
-	/*
-	Face f0 = { 0, 1, 2, 3, 4, 5 };
-	Face f1 = { 5, 4, 6, 7, 8, 9 };
-	Face f2 = { 9, 8, 10, 11, 12, 13 };
-	Face f3 = { 13, 12, 14, 15, 16, 17 };
-	Face f4 = { 17, 16, 18, 19, 1, 0 };
-	Face f5 = { 20, 21, 22, 23, 3, 2 };
-	Face f6 = { 23, 22, 24, 25, 26, 27 };
-	Face f7 = { 27, 26, 28, 29, 7, 6 };
-	Face f8 = { 29, 1, 2, 3, 4, 5 };
-	Face f9 = { 0, 1, 2, 3, 4, 5 };
-	Face f10 = { 0, 1, 2, 3, 4, 5 };
-	Face f11 = { 0, 1, 2, 3, 4, 5 };
-	*/
+Figure3D createNeveltorus(const int n, const int m) {
+	Figure3D fig;
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			double u = TAU * i / n;
+			double v = TAU * j / m;
+			double x = std::sin(u * (7 + std::cos((u / 3 - (2 * v)) + 2 * std::cos((u / 3) + v))));
+			double y = std::cos(u * (7 + std::cos((u / 3 - (2 * v)) + 2 * std::cos((u / 3) + v))));
+			double z = std::sin((u / 3) - (2 * v)) + 2 * std::sin((u / 3) + v);
+			Vector3D p = Vector3D::point(x, y, z);
+			fig.points.push_back(p);
+		}
+	}
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			Face f = { m * i + j, m * ((i + 1) % n) + j, m * ((i + 1) % n) + (j + 1) % m, m * i + (j + 1) % m };
+			fig.faces.push_back(f);
+		}
+	}
+	return fig;
+}
+
+Figure3D createMobiusband(const int n, const int m) {
+	Figure3D fig;
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			double u = TAU * i / n;
+			double v = TAU * j / m;
+			double x = (1 + 0.5 * v * std::cos(0.5 * u)) * std::cos(u);
+			double y = (1 + 0.5 * v * std::cos(0.5 * u)) * std::sin(u);
+			double z = 0.5 * v * std::sin(0.5 * u);
+			Vector3D p = Vector3D::point(x, y, z);
+			fig.points.push_back(p);
+		}
+	}
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			Face f;
+			if (i < n - 1) {
+				f = { m * i + j, m * ((i + 1) % n) + j, m * ((i + 1) % n) + (j + 1) % m, m * i + (j + 1) % m };
+			}
+			else {
+				f = { m * i + j, m - j, (j + 1) % m, m * i + (j + 1) % m };
+			}
+			fig.faces.push_back(f);
+		}
+	}
+	return fig;
+}
+
+Figure3D createZandloper(const int n, const double h) {
+	Figure3D fig;
+	for (int i = 0; i < n; i++) {
+		Vector3D p = Vector3D::point(std::cos(i * TAU / n), std::sin(i * TAU / n), 0);
+		fig.points.push_back(p);
+	}
+	for (int i = 0; i < n; i++) {
+		Vector3D p = Vector3D::point(std::cos(i * TAU / n), std::sin(i * TAU / n), h);
+		fig.points.push_back(p);
+	}
+	Face f1, f2, f;
+	for (int i = 0; i < n; i++) {
+		f = { i, (i + 1) % n, 1 + n + (i + 1) % n, n + (i + 1) % n };
+		fig.faces.push_back(f);
+		f1.insert(f1.begin(), i);
+		f2.push_back(i + n);
+	}
+	fig.faces.push_back(f1);
+	fig.faces.push_back(f2);
+	return fig;
+}
+
+Figure3D createBuckyball() {
+	Figure3D ico = createIcosahedron();
 	Figure3D buckyball;
 	for (Face& face : ico.faces) {
+		Vector3D p0, p1, p2, p3, p4, p5;
 		Vector3D A = ico.points[face[0]];
 		Vector3D B = ico.points[face[1]];
 		Vector3D C = ico.points[face[2]];
-		Vector3D p0 = (A + B) / 3;
-		Vector3D p1 = (A + B) * 2 / 3;
-		Vector3D p2 = (B + C) / 3;
-		Vector3D p3 = (B + C) * 2 / 3;
-		Vector3D p4 = (C + A) / 3;
-		Vector3D p5 = (C + A) * 2 / 3;
+		p0 = A * 2 / 3 + B / 3;
+		p1 = A / 3 + B * 2 / 3;
+		p2 = C / 3 + B * 2 / 3;
+		p3 = C * 2 / 3 + B / 3;
+		p4 = A / 3 + C * 2 / 3;
+		p5 = A * 2 / 3 + C / 3;
+		
 		int size = buckyball.points.size();
 		Face f = { size, size + 1, size + 2, size + 3, size + 4, size + 5 };
 		buckyball.points.push_back(p0);
@@ -418,7 +490,6 @@ Figure3D createBuckyball(const img::Color& c) {
 		buckyball.points.push_back(p5);
 		buckyball.faces.push_back(f);
 	}
-	buckyball.c = c;
 	return buckyball;
 }
 
@@ -428,14 +499,14 @@ std::vector<Face> triangulate(const Face& face) {
 		faces.push_back(face);
 		return faces;
 	}
-	for (int i = 1; i < face.size() - 1; i++) {
+	for (uint i = 1; i < face.size() - 1; i++) {
 		Face newFace = { face[0], face[i], face[i + 1] };
 		faces.push_back(newFace);
 	}
 	return faces;
 }
 
-img::EasyImage drawFigures(Figures3D& figures, int size, const img::Color& bgc) {
+img::EasyImage drawFigures(Figures3D& figures, int size, const img::Color& bgc, Lights3D& lights, Vector3D& eye) {
 	double xMax, xMin, yMax, yMin;
 	xMax = yMax = -std::numeric_limits<double>::infinity();
 	xMin = yMin = std::numeric_limits<double>::infinity();
@@ -465,7 +536,9 @@ img::EasyImage drawFigures(Figures3D& figures, int size, const img::Color& bgc) 
 			std::vector<Face> triangles = triangulate(face);
 			for (Face& triangle : triangles) {
 				buffer.draw_zbuf_triag(image, figure.points[triangle[0]],
-					figure.points[triangle[1]], figure.points[triangle[2]], d, dx, dy, figure.c);
+					figure.points[triangle[1]], figure.points[triangle[2]], d, dx, dy, 
+					figure.ambientReflection, figure.diffuseReflection, figure.specularReflection,
+					figure.reflectionCoefficient, lights, eye);
 			}
 		}
 	}
@@ -475,7 +548,7 @@ img::EasyImage drawFigures(Figures3D& figures, int size, const img::Color& bgc) 
 Figures3D generateFractal(Figure3D& fig, const int nrIt, const double scaleFactor) {
 	Figures3D fractal;
 	if (nrIt > 0) {
-		for (int i = 0; i < fig.points.size(); i++) {
+		for (uint i = 0; i < fig.points.size(); i++) {
 			Vector3D corner = fig.points[i];
 			Figure3D copy = fig;
 			Matrix M = scale(1 / (scaleFactor));
@@ -495,4 +568,33 @@ Figures3D generateFractal(Figure3D& fig, const int nrIt, const double scaleFacto
 		fractal.push_back(fig);
 	}
 	return fractal;
+}
+
+Figures3D generateThickFigure(Figure3D& fig, const double r, const int n, const int m) {
+	Figures3D figures;
+	for (Vector3D point : fig.points) {
+		Matrix M = scale(r);
+		Figure3D sphere = createSphere(m);
+		M *= shift(point);
+		applyTransformation(sphere, M); 
+		figures.push_back(sphere);
+	}
+	for (Face& face : fig.faces) {
+		for (uint i = 0; i < face.size(); i++) {
+			Vector3D p0 = fig.points.at(face.at(i));
+			Vector3D p1 = fig.points.at(face.at((i + 1) % face.size()));
+			Vector3D p0p1 = p1 - p0;
+			double h = p0p1.length() / r;
+			Figure3D cilinder = createCylinder(n, h, false);
+			double theta, phi, a;
+			toPolar(p0p1, theta, phi, a);
+			Matrix M = scale(r);
+			M *= rotateY(phi / PI * 180);
+			M *= rotateZ(theta / PI * 180);
+			M *= shift(p0);
+			applyTransformation(cilinder, M);
+			figures.push_back(cilinder);
+		}
+	}
+	return figures;
 }

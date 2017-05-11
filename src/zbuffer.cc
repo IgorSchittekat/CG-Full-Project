@@ -132,7 +132,8 @@ void intersection(double& xI1, double& xI2, double yI, double xP, double yP, dou
 }
 
 void ZBuffer::draw_zbuf_triag(img::EasyImage& img, const Vector3D& A, const Vector3D& B, const Vector3D& C,
-	double d, double dx, double dy, img::Color color) {
+	double d, double dx, double dy, LightColor ambientReflection, LightColor diffuseReflection,
+	LightColor specularReflection, double reflectionCoeff, Lights3D& lights, Vector3D& eye) {
 	Point2D pA((d * A.x) / (-A.z) + dx, (d * A.y) / (-A.z) + dy);
 	Point2D pB((d * B.x) / (-B.z) + dx, (d * B.y) / (-B.z) + dy);
 	Point2D pC((d * C.x) / (-C.z) + dx, (d * C.y) / (-C.z) + dy);
@@ -145,7 +146,10 @@ void ZBuffer::draw_zbuf_triag(img::EasyImage& img, const Vector3D& A, const Vect
 	double k = (w.x * A.x) + (w.y * A.y) + (w.z * A.z);
 	double dzdx = w.x / (-d * k);
 	double dzdy = w.y / (-d * k);
-
+	
+	Vector3D n = Vector3D::normalise(w);
+	
+	LightColor ambientColor = ambient(lights, ambientReflection);
 	int yMin = roundToInt(std::min({ pA.y, pB.y, pC.y }) + 0.5);
 	int yMax = roundToInt(std::max({ pA.y, pB.y, pC.y }) - 0.5);
 	for (int y = yMin; y <= yMax; y++) {
@@ -160,6 +164,19 @@ void ZBuffer::draw_zbuf_triag(img::EasyImage& img, const Vector3D& A, const Vect
 		for (int x = xL; x <= xR; x++) {
 			double zInv = 1.0001 * zGInv + ((double)x - xG) * dzdx + ((double)y - yG) * dzdy;
 			if (zInv < getBuffer(x, y)) {
+				Vector3D point = Vector3D::point(((double)x - dx) / (-d * zInv), ((double)y - dy) / (-d * zInv), 1 / zInv);
+				LightColor diffuseColor = diffuse(lights, diffuseReflection, n, point);
+				LightColor specularColor = specular(lights, specularReflection, reflectionCoeff, n, point, eye);
+				LightColor colorVec = { ambientColor.at(0) + diffuseColor.at(0) + specularColor.at(0),
+					ambientColor.at(1) + diffuseColor.at(1) + specularColor.at(1),
+					ambientColor.at(2) + diffuseColor.at(2) + specularColor.at(2) };
+				if (colorVec[0] > 1)
+					colorVec[0] = 1;
+				if (colorVec[1] > 1)
+					colorVec[1] = 1;
+				if (colorVec[2] > 1)
+					colorVec[2] = 1;
+				img::Color color(colorVec[0] * 255, colorVec[1] * 255, colorVec[2] * 255);
 				(img)(x, y) = color;
 				setBuffer(x, y, zInv);
 			}
